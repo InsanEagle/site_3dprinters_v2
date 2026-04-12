@@ -1,15 +1,18 @@
-import { Metadata } from "next";
+﻿import { Metadata } from "next";
 import { Container } from "@/components/shared/container";
 import { RequestForm } from "@/components/shared/request-form";
 import { SectionTitle } from "@/components/shared/section-title";
-import { contactsContent, formContent } from "@/data/content";
+import { contactsContent } from "@/data/content";
 import { siteConfig } from "@/data/site";
 import { getSafeEmailHref, getSafeExternalHref, getSafePhoneHref, getSafeText } from "@/lib/content";
+import { getContactsFormText } from "@/lib/request-ui";
 
 export const metadata: Metadata = {
   title: "Контакты | Изготовление деталей",
   description: contactsContent.intro
 };
+
+const contactsFormCopy = getContactsFormText();
 
 export default function ContactsPage() {
   const contacts = [
@@ -47,7 +50,7 @@ export default function ContactsPage() {
               </article>
             )}
           </div>
-          <RequestForm source="contacts-page-form" title={formContent.titleDefault} description={formContent.introDefault} />
+          <RequestForm source="contacts-page-form" {...contactsFormCopy} />
         </div>
       </Container>
     </div>

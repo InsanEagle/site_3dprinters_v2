@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+﻿import { Metadata } from "next";
 import { ServiceHeroActions } from "@/components/page/service-hero-actions";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
@@ -8,9 +8,12 @@ import { HeroSection } from "@/components/shared/hero-section";
 import { RequestForm } from "@/components/shared/request-form";
 import { SectionTitle } from "@/components/shared/section-title";
 import { Timeline } from "@/components/shared/timeline";
-import { formContent, homeContent, servicesContent } from "@/data/content";
+import { homeContent, servicesContent } from "@/data/content";
+import { getCustomFormText, getCustomPhotoRequestFormText } from "@/lib/request-ui";
 
 const service = servicesContent.find((item) => item.slug === "custom")!;
+const customFormCopy = getCustomFormText();
+const customPhotoCopy = getCustomPhotoRequestFormText();
 
 export const metadata: Metadata = {
   title: `${service.title} | Изготовление деталей`,
@@ -23,7 +26,16 @@ export default function CustomPage() {
       <HeroSection
         title={service.bodyTitle}
         description={service.bodyText}
-        actions={<ServiceHeroActions source="custom" anchorId="custom-form" />}
+        actions={
+          <ServiceHeroActions
+            source="custom"
+            anchorId="custom-form"
+            primaryLabel="Открыть форму по образцу"
+            secondaryLabel="Обсудить по фото"
+            secondaryCopy={customPhotoCopy}
+            noteText="Если вы ищете типовую или похожую позицию, удобнее сначала проверить каталог." noteLinkHref="/catalog" noteLinkLabel="Открыть каталог"
+          />
+        }
         aside={
           <div className="rounded-[32px] border border-line bg-white p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Когда это подходит</p>
@@ -37,6 +49,32 @@ export default function CustomPage() {
           </div>
         }
       />
+
+      <section className="py-16 sm:py-20">
+        <Container>
+          <SectionTitle eyebrow="Роль страницы" title="Это сценарий для нетиповых задач, а не замена каталогу" description="Страница помогает начать работу, когда нужной позиции нет в каталоге или требуется повторение детали по образцу, фото или размерам." />
+          <div className="grid gap-6 lg:grid-cols-2">
+            <article className="rounded-3xl border border-line bg-white p-8">
+              <h2 className="text-2xl font-semibold text-ink">Когда оставаться здесь</h2>
+              <p className="mt-4 text-base leading-7 text-body">
+                Этот сценарий подходит, если нужно повторить, восстановить или доработать конкретную деталь, а не выбрать типовую позицию из каталога.
+              </p>
+              <div className="mt-6">
+                <Button href="#custom-form">Перейти к форме по образцу</Button>
+              </div>
+            </article>
+            <article className="rounded-3xl border border-line bg-surface p-8">
+              <h2 className="text-2xl font-semibold text-ink">Когда лучше начать с каталога</h2>
+              <p className="mt-4 text-base leading-7 text-body">
+                Если вы только подбираете похожую типовую позицию или хотите сначала посмотреть примеры товаров, быстрее начать с каталога, а к этой странице вернуться при необходимости.
+              </p>
+              <div className="mt-6">
+                <Button href="/catalog" variant="secondary">Сначала посмотреть каталог</Button>
+              </div>
+            </article>
+          </div>
+        </Container>
+      </section>
 
       <section className="py-16 sm:py-20">
         <Container>
@@ -58,39 +96,24 @@ export default function CustomPage() {
         </Container>
       </section>
 
-      <section className="py-16 sm:py-20">
-        <Container>
-          <div className="grid gap-8 lg:grid-cols-2">
-            <div className="rounded-3xl border border-line bg-white p-8">
-              <h2 className="text-2xl font-semibold text-ink">Что важно учитывать</h2>
-              <p className="mt-4 text-base leading-7 text-body">
-                Возможность повторения зависит от геометрии, состояния исходной детали, требований к установке и условий эксплуатации будущего изделия.
-              </p>
-            </div>
-            <div className="rounded-3xl border border-line bg-white p-8">
-              <h2 className="text-2xl font-semibold text-ink">Если данных пока мало</h2>
-              <p className="mt-4 text-base leading-7 text-body">
-                Это не мешает начать. Для первичной оценки часто достаточно описания проблемы, нескольких фотографий и примерного назначения детали.
-              </p>
-              <div className="mt-6">
-                <Button href="#custom-form" variant="secondary">Перейти к форме</Button>
-              </div>
-            </div>
-          </div>
-        </Container>
-      </section>
-
       <section id="custom-form" className="py-16 sm:py-20">
         <Container>
-          <RequestForm source="custom-page-form" title={formContent.titleDefault} description={formContent.introDefault} />
+          <SectionTitle eyebrow="Форма" title="Основной сценарий страницы" description="Главное действие здесь — оставить запрос по образцу или нетиповой детали. Если удобнее начать с фотографии, можно использовать соседнюю кнопку в верхнем блоке." />
+          <RequestForm source="custom-page-form" {...customFormCopy} />
         </Container>
       </section>
 
       <CTASection
         title="Если деталь повреждена или ее трудно найти, начните с описания задачи"
-        description="Можно приложить фото, размеры, образец или готовую модель. Дальше мы поможем уточнить, какой путь работы подойдет лучше."
-        actions={<ServiceHeroActions source="custom-final" anchorId="custom-form" />}
+        description="Можно приложить фото, размеры, образец или готовую модель. Если сначала хотите посмотреть типовые позиции, удобнее открыть каталог, а затем вернуться к сценарию по образцу."
+        actions={
+          <>
+            <Button href="#custom-form">Открыть форму по образцу</Button>
+            <Button href="/catalog" variant="secondary">Сначала посмотреть каталог</Button>
+          </>
+        }
       />
     </>
   );
 }
+

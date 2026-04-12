@@ -1,14 +1,18 @@
-"use client";
+﻿"use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { formContent } from "@/data/content";
+import { getDefaultRequestFormText } from "@/lib/request-ui";
 import {
+  formatRequestFileSize,
+  REQUEST_UPLOAD_ACCEPT,
+  REQUEST_UPLOAD_MAX_FILES,
   RequestFieldErrors,
   RequestSubmissionPayload,
   RequestSubmissionResponse,
   requestValidationMessages,
+  validateRequestFiles,
   validateRequestSubmission
 } from "@/lib/request-submission";
 
@@ -20,9 +24,14 @@ type RequestFormProps = {
   compact?: boolean;
   titleId?: string;
   onSuccess?: () => void;
+  hints?: string[];
+  detailsPrefill?: string;
+  submitLabel?: string;
+  footerNote?: string;
+  chrome?: "page" | "embedded";
 };
 
-type RequestFormValues = Omit<RequestSubmissionPayload, "source">;
+type RequestFormValues = Omit<RequestSubmissionPayload, "source" | "attachments">;
 type RequestErrorCode = Extract<RequestSubmissionResponse, { ok: false }>["code"];
 
 type FormStatus =
@@ -32,29 +41,62 @@ type FormStatus =
   | { type: "error"; message: string; code?: RequestErrorCode };
 
 const emptyErrors: RequestFieldErrors = {};
+const defaultCopy = getDefaultRequestFormText();
 
 export function RequestForm({
   source,
-  title = formContent.titleDefault,
-  description = formContent.introDefault,
+  title = defaultCopy.title,
+  description = defaultCopy.description,
   productName,
   compact = false,
   titleId,
-  onSuccess
+  onSuccess,
+  hints = defaultCopy.hints,
+  detailsPrefill,
+  submitLabel = defaultCopy.submitLabel,
+  footerNote = defaultCopy.footerNote,
+  chrome = "page"
 }: RequestFormProps) {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [values, setValues] = useState<RequestFormValues>({
     name: "",
     contact: "",
     brand: "",
     model: "",
-    details: productName ? `Интересует позиция: ${productName}.` : "",
+    details: detailsPrefill ?? (productName ? `Интересует позиция: ${productName}.` : ""),
     productName
   });
+  const [files, setFiles] = useState<File[]>([]);
   const [fieldErrors, setFieldErrors] = useState<RequestFieldErrors>(emptyErrors);
   const [status, setStatus] = useState<FormStatus>({ type: "idle" });
 
   const isSubmitting = status.type === "loading";
+  const formClassName =
+    chrome === "embedded"
+      ? "rounded-none border-0 bg-transparent p-0"
+      : "rounded-3xl border border-line bg-white p-6 sm:p-8";
+  const fileSummary = useMemo(
+    () => (files.length ? `${files.length} из ${REQUEST_UPLOAD_MAX_FILES} файлов выбрано` : requestValidationMessages.fileHint),
+    [files.length]
+  );
+
+  function resetFileInput() {
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  }
+
+  function clearFileError() {
+    if (fieldErrors.file) {
+      setFieldErrors((current) => ({ ...current, file: undefined }));
+    }
+  }
+
+  function setFileValidationError(message: string) {
+    setFieldErrors((current) => ({ ...current, file: message }));
+    setStatus({ type: "error", message });
+  }
 
   function handleChange(event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
     const { name, value } = event.target;
@@ -69,6 +111,35 @@ export function RequestForm({
     }
   }
 
+  function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
+    const nextFiles = Array.from(event.target.files ?? []);
+    const fileMessage = validateRequestFiles(nextFiles);
+
+    if (fileMessage) {
+      setFiles([]);
+      resetFileInput();
+      setFileValidationError(fileMessage);
+      return;
+    }
+
+    setFiles(nextFiles);
+    clearFileError();
+
+    if (status.type !== "idle") {
+      setStatus({ type: "idle" });
+    }
+  }
+
+  function removeFile(index: number) {
+    const nextFiles = files.filter((_, currentIndex) => currentIndex !== index);
+    setFiles(nextFiles);
+    clearFileError();
+
+    if (!nextFiles.length) {
+      resetFileInput();
+    }
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -76,12 +147,17 @@ export function RequestForm({
       source,
       ...values
     });
+    const fileMessage = validateRequestFiles(files);
 
-    if (!validation.data) {
+    if (fileMessage) {
+      validation.fieldErrors.file = fileMessage;
+    }
+
+    if (!validation.data || fileMessage) {
       setFieldErrors(validation.fieldErrors);
       setStatus({
         type: "error",
-        message: "Проверьте обязательные поля формы и попробуйте снова."
+        message: fileMessage ?? "Проверьте обязательные поля формы и попробуйте снова."
       });
       return;
     }
@@ -89,16 +165,26 @@ export function RequestForm({
     setFieldErrors(emptyErrors);
     setStatus({
       type: "loading",
-      message: "Отправляем данные формы..."
+      message: files.length ? "Загружаем фото и отправляем заявку..." : "Отправляем данные формы..."
     });
 
     try {
+      const formData = new FormData();
+      formData.set("source", validation.data.source);
+      formData.set("name", validation.data.name);
+      formData.set("contact", validation.data.contact);
+      formData.set("brand", validation.data.brand ?? "");
+      formData.set("model", validation.data.model ?? "");
+      formData.set("details", validation.data.details);
+      formData.set("productName", validation.data.productName ?? "");
+
+      for (const file of files) {
+        formData.append("files", file);
+      }
+
       const response = await fetch("/api/requests", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(validation.data)
+        body: formData
       });
 
       const result = (await response.json()) as RequestSubmissionResponse;
@@ -129,15 +215,19 @@ export function RequestForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className="rounded-3xl border border-line bg-white p-6 sm:p-8">
+    <form onSubmit={handleSubmit} noValidate className={formClassName}>
       <div className="mb-6">
-        <h3 id={titleId} className="text-2xl font-semibold text-ink">{title}</h3>
+        <h3 id={titleId} className="text-2xl font-semibold text-ink">
+          {title}
+        </h3>
         <p className="mt-3 max-w-2xl text-base leading-7 text-body">{description}</p>
-        <div className="mt-4 grid gap-2 text-sm text-body">
-          {formContent.fieldsHints.map((hint) => (
-            <p key={hint}>• {hint}</p>
-          ))}
-        </div>
+        {hints?.length ? (
+          <div className="mt-4 grid gap-2 text-sm text-body">
+            {hints.map((hint) => (
+              <p key={hint}>• {hint}</p>
+            ))}
+          </div>
+        ) : null}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -216,16 +306,50 @@ export function RequestForm({
           ) : null}
         </label>
 
-        <label className="grid gap-2 text-sm font-medium text-ink sm:col-span-2">
-          Фотографии и файлы
-          <input
-            type="file"
-            disabled
-            aria-disabled="true"
-            className="cursor-not-allowed rounded-xl border border-dashed border-line bg-surface px-4 py-3 text-sm text-body opacity-70"
-          />
-          <span className="text-xs leading-6 text-body">{requestValidationMessages.fileUnavailable}</span>
-        </label>
+        <div className="grid gap-2 text-sm font-medium text-ink sm:col-span-2">
+          <div className="flex items-center justify-between gap-3">
+            <span>Фотографии детали</span>
+            <span className="text-xs font-normal text-body">{fileSummary}</span>
+          </div>
+          <label className="flex cursor-pointer flex-col gap-3 rounded-2xl border border-dashed border-line bg-surface px-4 py-4 text-sm text-body transition hover:border-accent hover:bg-white">
+            <span className="font-medium text-ink">Прикрепить фото</span>
+            <span>Поддерживаются JPG, PNG и WEBP. Можно выбрать несколько изображений сразу.</span>
+            <input
+              ref={fileInputRef}
+              type="file"
+              name="files"
+              accept={REQUEST_UPLOAD_ACCEPT}
+              multiple
+              onChange={handleFileChange}
+              className="sr-only"
+            />
+          </label>
+          <span className="text-xs leading-6 text-body">{requestValidationMessages.fileHint}</span>
+          {fieldErrors.file ? (
+            <span id="request-file-error" className="text-xs leading-6 text-red-600">
+              {fieldErrors.file}
+            </span>
+          ) : null}
+          {files.length ? (
+            <div className="grid gap-2">
+              {files.map((file, index) => (
+                <div key={`${file.name}-${file.size}-${index}`} className="flex items-center justify-between gap-3 rounded-2xl border border-line bg-white px-4 py-3 text-sm text-body">
+                  <div className="min-w-0">
+                    <p className="truncate font-medium text-ink">{file.name}</p>
+                    <p>{formatRequestFileSize(file.size)}</p>
+                  </div>
+                  <button
+                    type="button"
+                    className="shrink-0 rounded-full border border-line px-3 py-1.5 text-xs font-medium text-ink transition hover:bg-surface"
+                    onClick={() => removeFile(index)}
+                  >
+                    Убрать
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <div className="mt-6 flex flex-col gap-4">
@@ -252,11 +376,9 @@ export function RequestForm({
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm leading-6 text-body">
-            Заявка считается отправленной только после успешного ответа сервера.
-          </p>
+          <p className="text-sm leading-6 text-body">{footerNote}</p>
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Отправляем..." : "Отправить заявку"}
+            {isSubmitting ? (files.length ? "Загружаем и отправляем..." : "Отправляем...") : submitLabel}
           </Button>
         </div>
       </div>

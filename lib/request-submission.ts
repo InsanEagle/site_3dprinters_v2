@@ -1,6 +1,26 @@
+﻿import path from "path";
+
 export const REQUEST_FIELD_NAMES = ["name", "contact", "details", "file"] as const;
+export const REQUEST_UPLOAD_MAX_FILES = 5;
+export const REQUEST_UPLOAD_MAX_FILE_SIZE = 8 * 1024 * 1024;
+export const REQUEST_UPLOAD_ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
+export const REQUEST_UPLOAD_ACCEPT = REQUEST_UPLOAD_ALLOWED_TYPES.join(",");
 
 export type RequestFieldName = (typeof REQUEST_FIELD_NAMES)[number];
+export type RequestUploadMimeType = (typeof REQUEST_UPLOAD_ALLOWED_TYPES)[number];
+export type RequestLikeFile = {
+  name: string;
+  type: string;
+  size: number;
+};
+
+export type RequestAttachment = {
+  fileName: string;
+  contentType: string;
+  size: number;
+  relativeUrl: string;
+  url: string;
+};
 
 export type RequestSubmissionPayload = {
   source: string;
@@ -10,6 +30,7 @@ export type RequestSubmissionPayload = {
   model?: string;
   details: string;
   productName?: string;
+  attachments?: RequestAttachment[];
 };
 
 export type RequestFieldErrors = Partial<Record<RequestFieldName, string>>;
@@ -38,6 +59,11 @@ export type RequestWebhookEvent = {
   };
 };
 
+const allowedExtensionsLabel = "JPG, PNG или WEBP";
+const maxFileSizeLabel = `${Math.round(REQUEST_UPLOAD_MAX_FILE_SIZE / (1024 * 1024))} МБ`;
+const maxFilesLabel = String(REQUEST_UPLOAD_MAX_FILES);
+const uploadDirLabel = path.posix.join("public", "uploads", "requests");
+
 export const requestValidationMessages = {
   nameRequired: "Укажите имя, чтобы мы понимали, как к вам обратиться.",
   nameTooShort: "Имя должно содержать не меньше 2 символов.",
@@ -45,14 +71,17 @@ export const requestValidationMessages = {
   contactTooShort: "Контакт выглядит слишком коротким. Добавьте больше данных для связи.",
   detailsRequired: "Опишите задачу, чтобы можно было провести первичную оценку.",
   detailsTooShort: "Добавьте чуть больше деталей: что нужно изготовить, восстановить или доработать.",
-  fileUnavailable:
-    "Прикрепление файлов через сайт пока не настроено. Добавьте описание и передайте материалы отдельным каналом после ответа на заявку.",
+  fileHint: `Можно прикрепить до ${maxFilesLabel} фото формата ${allowedExtensionsLabel}, до ${maxFileSizeLabel} на файл.`,
+  fileTooMany: `Можно прикрепить не больше ${maxFilesLabel} файлов за одну заявку.`,
+  fileUnsupportedType: `Поддерживаются только изображения формата ${allowedExtensionsLabel}.`,
+  fileTooLarge: `Размер одного файла не должен превышать ${maxFileSizeLabel}.`,
+  fileSaveError: `Не удалось подготовить фото к отправке. Попробуйте выбрать файлы заново или отправить заявку без них.`,
   formUnavailable:
     "Отправка через сайт пока не подключена. Заявка не была отправлена. Добавьте webhook в env или используйте другой канал связи.",
   deliveryFailed:
     "Заявка не была доставлена в канал приема. Проверьте настройки webhook или попробуйте повторить отправку позже.",
   serverError: "Не удалось обработать заявку из-за технической ошибки. Попробуйте еще раз позже.",
-  success: "Заявка отправлена. Мы получили запрос и вернемся с уточнениями, если они понадобятся."
+  success: `Заявка отправлена. Мы получили запрос${uploadDirLabel ? " и прикрепленные фото, если они были добавлены" : ""}.`
 } as const;
 
 const NAME_MIN_LENGTH = 2;
@@ -61,6 +90,7 @@ const CONTACT_MIN_LENGTH = 5;
 const CONTACT_MAX_LENGTH = 120;
 const DETAILS_MIN_LENGTH = 10;
 const DETAILS_MAX_LENGTH = 2000;
+
 function normalizeText(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
@@ -68,6 +98,69 @@ function normalizeText(value: unknown) {
 function normalizeOptionalText(value: unknown) {
   const normalized = normalizeText(value);
   return normalized || undefined;
+}
+
+function normalizeAttachments(value: unknown): RequestAttachment[] | undefined {
+  if (!Array.isArray(value) || !value.length) {
+    return undefined;
+  }
+
+  const attachments = value
+    .map((item) => {
+      if (!item || typeof item !== "object") {
+        return null;
+      }
+
+      const candidate = item as Partial<RequestAttachment>;
+      const fileName = normalizeText(candidate.fileName);
+      const contentType = normalizeText(candidate.contentType);
+      const relativeUrl = normalizeText(candidate.relativeUrl);
+      const url = normalizeText(candidate.url);
+      const size = typeof candidate.size === "number" && Number.isFinite(candidate.size) ? candidate.size : 0;
+
+      if (!fileName || !contentType || !relativeUrl || !url || size <= 0) {
+        return null;
+      }
+
+      return {
+        fileName,
+        contentType,
+        size,
+        relativeUrl,
+        url
+      } satisfies RequestAttachment;
+    })
+    .filter(Boolean) as RequestAttachment[];
+
+  return attachments.length ? attachments : undefined;
+}
+
+export function formatRequestFileSize(bytes: number) {
+  if (bytes >= 1024 * 1024) {
+    return `${(bytes / (1024 * 1024)).toFixed(1).replace(/\.0$/, "")} МБ`;
+  }
+
+  return `${Math.max(1, Math.round(bytes / 1024))} КБ`;
+}
+
+export function validateRequestFiles(files: RequestLikeFile[]) {
+  if (!files.length) {
+    return;
+  }
+
+  if (files.length > REQUEST_UPLOAD_MAX_FILES) {
+    return requestValidationMessages.fileTooMany;
+  }
+
+  for (const file of files) {
+    if (!REQUEST_UPLOAD_ALLOWED_TYPES.includes(file.type as RequestUploadMimeType)) {
+      return `${requestValidationMessages.fileUnsupportedType} Файл: ${file.name}.`;
+    }
+
+    if (file.size > REQUEST_UPLOAD_MAX_FILE_SIZE) {
+      return `${requestValidationMessages.fileTooLarge} Файл: ${file.name}.`;
+    }
+  }
 }
 
 export function validateRequestSubmission(payload: unknown): {
@@ -81,6 +174,7 @@ export function validateRequestSubmission(payload: unknown): {
   const brand = normalizeOptionalText((payload as RequestSubmissionPayload | undefined)?.brand);
   const model = normalizeOptionalText((payload as RequestSubmissionPayload | undefined)?.model);
   const productName = normalizeOptionalText((payload as RequestSubmissionPayload | undefined)?.productName);
+  const attachments = normalizeAttachments((payload as RequestSubmissionPayload | undefined)?.attachments);
 
   const fieldErrors: RequestFieldErrors = {};
 
@@ -108,6 +202,20 @@ export function validateRequestSubmission(payload: unknown): {
     fieldErrors.details = `Описание должно быть короче ${DETAILS_MAX_LENGTH + 1} символа.`;
   }
 
+  if (attachments?.length) {
+    const fileValidationMessage = validateRequestFiles(
+      attachments.map((attachment) => ({
+        name: attachment.fileName,
+        type: attachment.contentType,
+        size: attachment.size
+      }))
+    );
+
+    if (fileValidationMessage) {
+      fieldErrors.file = fileValidationMessage;
+    }
+  }
+
   if (!source || Object.keys(fieldErrors).length) {
     return { fieldErrors };
   }
@@ -120,7 +228,8 @@ export function validateRequestSubmission(payload: unknown): {
       details,
       brand,
       model,
-      productName
+      productName,
+      attachments
     },
     fieldErrors
   };
@@ -203,9 +312,7 @@ async function deliverRequestViaWebhook(
   }
 }
 
-export async function submitRequestSubmission(
-  payload: RequestSubmissionPayload
-): Promise<RequestSubmissionResponse> {
+export async function submitRequestSubmission(payload: RequestSubmissionPayload): Promise<RequestSubmissionResponse> {
   const availability = getRequestSubmissionAvailability();
 
   if (!availability.isConfigured) {

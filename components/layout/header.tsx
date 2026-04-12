@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -7,6 +7,7 @@ import { Container } from "@/components/shared/container";
 import { brandContent } from "@/data/content";
 import { siteConfig } from "@/data/site";
 import { getSafePhoneHref, getSafeText } from "@/lib/content";
+import { getHeaderRequestFormText } from "@/lib/request-ui";
 import { cn } from "@/lib/utils";
 import { useRequestModal } from "@/components/shared/request-modal";
 
@@ -26,6 +27,7 @@ export function Header() {
   const companyName = getSafeText(siteConfig.name) ?? brandContent.workingTitle;
   const phone = getSafeText(siteConfig.phone);
   const phoneHref = getSafePhoneHref(siteConfig.phone);
+  const headerCopy = getHeaderRequestFormText();
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
@@ -54,7 +56,7 @@ export function Header() {
               {phone}
             </a>
           ) : null}
-          <Button onClick={() => openModal({ title: "Оставить заявку", source: `header:${pathname}` })}>Оставить заявку</Button>
+          <Button onClick={() => openModal({ ...headerCopy, source: `header:${pathname}` })}>Оставить заявку</Button>
         </div>
       </Container>
       <div className="border-t border-line lg:hidden">

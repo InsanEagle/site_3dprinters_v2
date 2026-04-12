@@ -1,4 +1,8 @@
-import { expect, test } from "@playwright/test";
+﻿import { expect, test } from "@playwright/test";
+import path from "path";
+
+const sampleImagePath = path.join(process.cwd(), "tests", "fixtures", "sample-image.png");
+const sampleNotePath = path.join(process.cwd(), "tests", "fixtures", "sample-note.txt");
 
 test("desktop: core routes, catalog filters, product, form error and thanks flow", async ({ page, isMobile }) => {
   test.skip(isMobile, "Desktop-only assertions.");
@@ -30,18 +34,28 @@ test("desktop: product page CTA opens request modal", async ({ page, isMobile })
   await page.goto("/product/dashboard-panel-replacement");
   await page.locator("main button").filter({ hasText: /Оставить заявку/i }).first().click();
   await expect(page.getByRole("dialog")).toBeVisible();
-  await expect(page.getByRole("button", { name: /Закрыть форму/i })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Закрыть/i })).toBeVisible();
 });
 
-test("desktop: contacts form completes thanks flow", async ({ page, isMobile }) => {
+test("desktop: contacts form completes thanks flow with photo", async ({ page, isMobile }) => {
   test.skip(isMobile, "Desktop-only assertions.");
 
   await page.goto("/contacts");
   await page.getByLabel(/Имя/i).fill("Иван");
   await page.getByLabel(/Телефон|email|мессенджер/i).fill("+79990000000");
   await page.getByLabel(/Краткое описание задачи/i).fill("Нужна оценка детали для теста");
+  await page.locator('input[type="file"]').setInputFiles(sampleImagePath);
+  await expect(page.getByText(/sample-image\.png/i)).toBeVisible();
   await page.getByRole("button", { name: /^Отправить заявку$/i }).click();
   await expect(page).toHaveURL(/\/thanks\?source=/);
+});
+
+test("desktop: unsupported file type shows friendly validation", async ({ page, isMobile }) => {
+  test.skip(isMobile, "Desktop-only assertions.");
+
+  await page.goto("/contacts");
+  await page.locator('input[type="file"]').setInputFiles(sampleNotePath);
+  await expect(page.locator("#request-file-error")).toContainText(/Поддерживаются только изображения формата/i);
 });
 
 test("desktop: broken not-found routes show recovery actions", async ({ page, isMobile }) => {
@@ -90,4 +104,18 @@ test("mobile: header, horizontal nav and catalog remain usable", async ({ page, 
   await page.getByRole("searchbox").fill("panel");
   await page.getByRole("button", { name: /показать/i }).click();
   await expect(page.getByRole("link", { name: /Подробнее/i }).first()).toBeVisible();
+});
+
+
+test("mobile: contacts form with photo remains usable", async ({ page, isMobile }) => {
+  test.skip(!isMobile, "Mobile-only assertions.");
+
+  await page.goto("/contacts");
+  await page.getByLabel(/Имя/i).fill("Иван");
+  await page.getByLabel(/Телефон|email|мессенджер/i).fill("+79990000000");
+  await page.getByLabel(/Краткое описание задачи/i).fill("Нужна оценка детали для мобильного теста");
+  await page.locator('input[type="file"]').setInputFiles(sampleImagePath);
+  await expect(page.getByText(/sample-image\.png/i)).toBeVisible();
+  await page.getByRole("button", { name: /^Отправить заявку$/i }).click();
+  await expect(page).toHaveURL(/\/thanks\?source=/);
 });

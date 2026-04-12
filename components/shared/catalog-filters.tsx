@@ -1,4 +1,4 @@
-import { Category } from "@/types";
+﻿import { Category } from "@/types";
 import { Button } from "@/components/ui/button";
 
 type CatalogFiltersProps = {
@@ -9,6 +9,7 @@ type CatalogFiltersProps = {
   resultsCount: number;
   totalCount: number;
   categoryLocked?: boolean;
+  resultsAnchorId?: string;
 };
 
 export function CatalogFilters({
@@ -18,15 +19,17 @@ export function CatalogFilters({
   query,
   resultsCount,
   totalCount,
-  categoryLocked = false
+  categoryLocked = false,
+  resultsAnchorId
 }: CatalogFiltersProps) {
   const activeFiltersCount = Number(Boolean(selectedCategory)) + Number(Boolean(query));
   const currentCategory = categories.find((category) => category.slug === selectedCategory);
   const resetHref = categoryLocked ? pathname : "/catalog";
+  const formAction = resultsAnchorId ? `${pathname}#${resultsAnchorId}` : pathname;
 
   return (
     <div className="mb-12 rounded-3xl border border-line bg-surface p-6">
-      <form action={pathname} className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(220px,0.8fr)_auto_auto] lg:items-end">
+      <form action={formAction} className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(220px,0.8fr)_auto_auto] lg:items-end">
         <label className="grid gap-2 text-sm font-medium text-ink">
           Поиск по каталогу
           <input
@@ -75,7 +78,11 @@ export function CatalogFilters({
         <p>
           Найдено {resultsCount} из {totalCount} {totalCount === 1 ? "позиции" : "позиций"}.
         </p>
-        <p>{activeFiltersCount ? `Активных фильтров: ${activeFiltersCount}` : "Фильтры не применены."}</p>
+        <p>
+          {activeFiltersCount
+            ? `Активных фильтров: ${activeFiltersCount}.${resultsAnchorId ? " После применения форма переводит к блоку с результатами." : ""}`
+            : "Фильтры не применены."}
+        </p>
       </div>
     </div>
   );

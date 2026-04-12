@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+﻿import { Metadata } from "next";
 import { ServiceHeroActions } from "@/components/page/service-hero-actions";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
@@ -8,9 +8,12 @@ import { HeroSection } from "@/components/shared/hero-section";
 import { RequestForm } from "@/components/shared/request-form";
 import { SectionTitle } from "@/components/shared/section-title";
 import { Timeline } from "@/components/shared/timeline";
-import { formContent, homeContent, servicesContent } from "@/data/content";
+import { homeContent, servicesContent } from "@/data/content";
+import { getScanFormText, getScanPhotoRequestFormText } from "@/lib/request-ui";
 
 const service = servicesContent.find((item) => item.slug === "3d-scan")!;
+const scanFormCopy = getScanFormText();
+const scanPhotoCopy = getScanPhotoRequestFormText();
 
 export const metadata: Metadata = {
   title: `${service.title} | Изготовление деталей`,
@@ -23,7 +26,16 @@ export default function ScanPage() {
       <HeroSection
         title={service.bodyTitle}
         description={service.bodyText}
-        actions={<ServiceHeroActions source="scan" anchorId="scan-form" />}
+        actions={
+          <ServiceHeroActions
+            source="scan"
+            anchorId="scan-form"
+            primaryLabel="Запросить оценку сканирования"
+            secondaryLabel="Обсудить по фото"
+            secondaryCopy={scanPhotoCopy}
+            noteText="Если вы ищете уже понятную типовую позицию, удобнее начать с каталога, а сюда приходить для задач со сложной геометрией." noteLinkHref="/catalog" noteLinkLabel="Открыть каталог"
+          />
+        }
         aside={
           <div className="rounded-[32px] border border-line bg-white p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Когда это подходит</p>
@@ -71,12 +83,13 @@ export default function ScanPage() {
               </ul>
             </div>
             <div className="rounded-3xl border border-line bg-white p-8">
-              <h2 className="text-2xl font-semibold text-ink">Что важно знать</h2>
+              <h2 className="text-2xl font-semibold text-ink">Когда лучше сначала открыть каталог</h2>
               <p className="mt-4 text-base leading-7 text-body">
-                3D-сканирование не всегда является единственным путем решения задачи. Иногда оно используется как промежуточный этап перед моделированием, доработкой и изготовлением.
+                Если задача уже сводится к поиску похожей типовой позиции, быстрее сначала посмотреть каталог. Сканирование полезно там, где нужен отдельный этап подготовки геометрии.
               </p>
-              <div className="mt-6">
-                <Button href="#scan-form" variant="secondary">Перейти к форме</Button>
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+                <Button href="#scan-form">Перейти к форме</Button>
+                <Button href="/catalog" variant="secondary">Открыть каталог</Button>
               </div>
             </div>
           </div>
@@ -85,15 +98,22 @@ export default function ScanPage() {
 
       <section id="scan-form" className="py-16 sm:py-20">
         <Container>
-          <RequestForm source="scan-page-form" title={formContent.titleDefault} description={formContent.introDefault} />
+          <SectionTitle eyebrow="Форма" title="Основной сценарий страницы" description="Главное действие здесь — оставить запрос на оценку 3D-сканирования. Кнопка про фото остается как более мягкий вход в тот же сценарий, если еще рано заполнять основную форму." />
+          <RequestForm source="scan-page-form" {...scanFormCopy} />
         </Container>
       </section>
 
       <CTASection
         title="Если нет готовой модели, можно начать с фотографии или образца"
-        description="На этапе первичной оценки достаточно описать задачу и передать исходные данные в удобном формате."
-        actions={<ServiceHeroActions source="scan-final" anchorId="scan-form" />}
+        description="На этапе первичной оценки достаточно описать задачу и передать исходные данные в удобном формате. Если вам сначала нужен подбор типовой позиции, удобнее открыть каталог."
+        actions={
+          <>
+            <Button href="#scan-form">Запросить оценку сканирования</Button>
+            <Button href="/catalog" variant="secondary">Открыть каталог</Button>
+          </>
+        }
       />
     </>
   );
 }
+

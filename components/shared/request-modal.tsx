@@ -1,13 +1,19 @@
-"use client";
+﻿"use client";
 
-import { createContext, ReactNode, useContext, useMemo, useState } from "react";
+import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from "react";
 import { RequestForm } from "@/components/shared/request-form";
+import { getDefaultRequestFormText } from "@/lib/request-ui";
 
 type ModalState = {
   open: boolean;
-  title?: string;
   source: string;
   productName?: string;
+  title?: string;
+  description?: string;
+  hints?: string[];
+  detailsPrefill?: string;
+  submitLabel?: string;
+  footerNote?: string;
 };
 
 type RequestModalContextValue = {
@@ -16,57 +22,116 @@ type RequestModalContextValue = {
 };
 
 const RequestModalContext = createContext<RequestModalContextValue | null>(null);
+const defaultCopy = getDefaultRequestFormText();
 
 export function RequestModalProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<ModalState>({
     open: false,
-    title: "Оставить заявку",
+    title: defaultCopy.title,
+    description: defaultCopy.description,
+    hints: defaultCopy.hints,
+    submitLabel: defaultCopy.submitLabel,
+    footerNote: defaultCopy.footerNote,
     source: "global-modal"
   });
+
+  const closeModal = useMemo(
+    () => () => setState((current) => ({ ...current, open: false })),
+    []
+  );
 
   const value = useMemo(
     () => ({
       openModal: (next?: Partial<ModalState>) =>
         setState({
           open: true,
-          title: next?.title ?? "Оставить заявку",
+          title: next?.title ?? defaultCopy.title,
+          description: next?.description ?? defaultCopy.description,
+          hints: next?.hints ?? defaultCopy.hints,
+          detailsPrefill: next?.detailsPrefill,
+          submitLabel: next?.submitLabel ?? defaultCopy.submitLabel,
+          footerNote: next?.footerNote ?? defaultCopy.footerNote,
           source: next?.source ?? "global-modal",
           productName: next?.productName
         }),
-      closeModal: () => setState((current) => ({ ...current, open: false }))
+      closeModal
     }),
-    []
+    [closeModal]
   );
+
+  useEffect(() => {
+    if (!state.open) {
+      return;
+    }
+
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        closeModal();
+      }
+    };
+
+    document.body.style.overflow = "hidden";
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [closeModal, state.open]);
 
   return (
     <RequestModalContext.Provider value={value}>
       {children}
       {state.open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="request-modal-title"
-            className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-[32px] bg-white p-3"
-          >
-            <div className="mb-3 flex justify-end">
-              <button
-                type="button"
-                className="rounded-full border border-line px-3 py-2 text-sm text-ink"
-                onClick={value.closeModal}
-                aria-label="Закрыть форму"
-              >
-                Закрыть
-              </button>
+        <div
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/55 p-3 sm:p-4"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              closeModal();
+            }
+          }}
+        >
+          <div className="flex min-h-full items-start justify-center sm:items-center" onMouseDown={(event) => { if (event.target === event.currentTarget) { closeModal(); } }}>
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="request-modal-title"
+              className="my-4 flex max-h-[min(92vh,820px)] w-full max-w-3xl flex-col overflow-hidden rounded-[32px] border border-line bg-white shadow-[0_24px_80px_rgba(15,23,42,0.24)]"
+              onMouseDown={(event) => event.stopPropagation()}
+            >
+              <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-white/95 px-5 py-4 backdrop-blur sm:px-6">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-accent">Форма запроса</p>
+                  <p className="mt-1 text-sm leading-6 text-body">Можно закрыть окно по кнопке, по клику вне модалки или клавишей Esc.</p>
+                </div>
+                <button
+                  type="button"
+                  className="shrink-0 rounded-full border border-line bg-white px-4 py-2 text-sm font-medium text-ink transition hover:bg-surface"
+                  onClick={closeModal}
+                  aria-label="Закрыть форму"
+                >
+                  Закрыть
+                </button>
+              </div>
+
+              <div className="overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+                <RequestForm
+                  source={state.source}
+                  title={state.title}
+                  description={state.description}
+                  hints={state.hints}
+                  detailsPrefill={state.detailsPrefill}
+                  submitLabel={state.submitLabel}
+                  footerNote={state.footerNote}
+                  productName={state.productName}
+                  compact
+                  chrome="embedded"
+                  titleId="request-modal-title"
+                  onSuccess={closeModal}
+                />
+              </div>
             </div>
-            <RequestForm
-              source={state.source}
-              title={state.title}
-              productName={state.productName}
-              compact
-              titleId="request-modal-title"
-              onSuccess={value.closeModal}
-            />
           </div>
         </div>
       ) : null}
@@ -81,3 +146,4 @@ export function useRequestModal() {
   }
   return context;
 }
+
