@@ -124,6 +124,18 @@ export function getBuyFallbackFormText(productName: string): RequestFormText {
   };
 }
 
+export function getMarketplaceFallbackFormText(productName: string): RequestFormText {
+  return {
+    title: "Позиция пока остается в marketplace-сценарии",
+    description:
+      "Для этой позиции прямой checkout на сайте пока не является основным путем. Через форму можно уточнить наличие, текущий канал покупки или альтернативный сценарий.",
+    hints: ["Нужна ли именно эта позиция", "Интересует наличие или текущая цена", "Нужно ли подобрать аналог или сохранить контекст товара"],
+    detailsPrefill: `Интересует позиция: ${productName}. Нужно уточнить актуальный marketplace-сценарий или альтернативный способ покупки.`,
+    submitLabel: "Уточнить сценарий покупки",
+    footerNote: "Форма не имитирует заказ на маркетплейсе, а сохраняет запрос по позиции."
+  };
+}
+
 export function getContactsFormText(): RequestFormText {
   return {
     title: "Оставить заявку или задать вопрос",

@@ -8,8 +8,22 @@ import { ProductSpecs } from "@/components/shared/product-specs";
 import { SectionTitle } from "@/components/shared/section-title";
 import { Button } from "@/components/ui/button";
 import { productContent } from "@/data/content";
-import { getProductBySlug, getRelatedProducts } from "@/lib/catalog";
+import {
+  canProductBePurchasedDirectly,
+  getProductAvailabilityLabel,
+  getProductBySlug,
+  getProductCommerceNote,
+  getProductMarketplaceHref,
+  getProductPriceLabel,
+  getProductScenarioLabel,
+  getProductSalesModeLabel,
+  getRelatedProducts,
+  hasProductMarketplaceLink,
+  isDirectSaleProduct,
+  isMarketplaceProduct
+} from "@/lib/catalog";
 import { getSafeText } from "@/lib/content";
+import { getProductDeliverySummary } from "@/lib/delivery";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -37,7 +51,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const shortDescription = getSafeText(product.shortDescription);
   const description = getSafeText(product.description);
   const compatibility = getSafeText(product.compatibility);
-  const price = getSafeText(product.price) ?? productContent.priceFallback;
+  const price = getProductPriceLabel(product) ?? productContent.priceFallback;
   const material = getSafeText(product.material);
   const color = getSafeText(product.color);
   const leadTime = getSafeText(product.leadTime) ?? productContent.leadTimeFallback;
@@ -46,11 +60,22 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   const installation = getSafeText(product.installation);
   const delivery = getSafeText(product.delivery) ?? productContent.deliveryFallback;
   const important = getSafeText(product.important);
+  const availabilityLabel = getProductAvailabilityLabel(product.availability);
+  const salesModeLabel = getProductSalesModeLabel(product.salesMode);
+  const scenarioLabel = getProductScenarioLabel(product);
+  const commerceNote = getProductCommerceNote(product);
+  const deliverySummary = getProductDeliverySummary(product);
+  const canAddToCart = canProductBePurchasedDirectly(product);
+  const hasMarketplaceUrl = hasProductMarketplaceLink(product);
+  const marketplaceHref = getProductMarketplaceHref(product);
   const specItems = [
+    { label: "Артикул", value: product.sku },
     ...(material ? [{ label: "Материал", value: material }] : []),
     ...(brand ? [{ label: "Марка", value: brand }] : []),
     ...(model ? [{ label: "Модель", value: model }] : []),
     ...(color ? [{ label: "Цвет", value: color }] : []),
+    { label: "Наличие", value: availabilityLabel },
+    { label: "Сценарий продажи", value: salesModeLabel },
     { label: "Срок изготовления", value: leadTime }
   ];
 
@@ -64,8 +89,34 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             <h1 className="mt-3 text-4xl font-semibold tracking-tight text-ink">{product.name}</h1>
             {shortDescription ? <p className="mt-4 text-lg leading-8 text-body">{shortDescription}</p> : null}
             <div className="mt-6 text-3xl font-semibold text-ink">{price}</div>
+            <p className="mt-2 text-sm font-medium text-accent">{scenarioLabel}</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.08em]">
+              <span className="rounded-full bg-surface px-3 py-1 text-body">{salesModeLabel}</span>
+              <span className="rounded-full bg-surface px-3 py-1 text-body">{availabilityLabel}</span>
+            </div>
+            <p className="mt-4 rounded-2xl border border-line bg-surface px-4 py-3 text-sm leading-6 text-body">{commerceNote}</p>
+            {isDirectSaleProduct(product) ? (
+              <div className="mt-4 rounded-2xl border border-line bg-white px-4 py-4 text-sm leading-6 text-body">
+                <p className="font-semibold text-ink">Получение заказа</p>
+                <p className="mt-2">{deliverySummary.summary}</p>
+                <p className="mt-2">Доступные способы: {deliverySummary.methodLabels}.</p>
+                <p className="mt-2">{deliverySummary.checkoutNote}</p>
+              </div>
+            ) : null}
+            {isMarketplaceProduct(product) && hasMarketplaceUrl && marketplaceHref ? (
+              <p className="mt-4 text-sm leading-6 text-body">
+                Основной канал покупки для этой позиции вынесен на маркетплейс. На сайте сохраняем карточку товара, описание и переход в актуальный канал.
+              </p>
+            ) : null}
+            {isDirectSaleProduct(product) ? (
+              <p className="mt-4 text-sm leading-6 text-body">
+                {canAddToCart
+                  ? "Для этой позиции доступна базовая корзина: можно добавить товар, изменить количество и собрать набор перед следующим этапом оформления."
+                  : "Для этой позиции корзина пока не используется: если цена или условия требуют уточнения, сайт честно оставляет direct-sale сценарий через запрос."}
+              </p>
+            ) : null}
             <div className="mt-6">
-              <ProductActions productName={product.name} />
+              <ProductActions product={product} />
             </div>
             <div className="mt-8">
               <ProductSpecs items={specItems} />

@@ -1,4 +1,5 @@
-﻿import path from "path";
+import path from "path";
+import { deliverJsonWebhook, getWebhookDeliveryConfig } from "@/lib/webhook-delivery";
 
 export const REQUEST_FIELD_NAMES = ["name", "contact", "details", "file"] as const;
 export const REQUEST_UPLOAD_MAX_FILES = 5;
@@ -235,18 +236,7 @@ export function validateRequestSubmission(payload: unknown): {
   };
 }
 
-export function getRequestSubmissionAvailability() {
-  const webhookUrl = normalizeText(process.env.REQUESTS_WEBHOOK_URL);
-  const webhookToken = normalizeText(process.env.REQUESTS_WEBHOOK_TOKEN);
-  const siteName = normalizeText(process.env.NEXT_PUBLIC_SITE_NAME) || "Изготовление деталей";
-
-  return {
-    isConfigured: Boolean(webhookUrl),
-    webhookUrl: webhookUrl || undefined,
-    webhookToken: webhookToken || undefined,
-    siteName
-  };
-}
+export const getRequestSubmissionAvailability = getWebhookDeliveryConfig;
 
 function buildWebhookEvent(payload: RequestSubmissionPayload, siteName: string): RequestWebhookEvent {
   return {
@@ -265,7 +255,7 @@ async function deliverRequestViaWebhook(
   event: RequestWebhookEvent,
   config: ReturnType<typeof getRequestSubmissionAvailability>
 ): Promise<RequestSubmissionResponse> {
-  if (!config.webhookUrl) {
+  if (!config.isConfigured) {
     return {
       ok: false,
       code: "submission_unavailable" as const,
@@ -273,43 +263,29 @@ async function deliverRequestViaWebhook(
     };
   }
 
-  try {
-    const headers: Record<string, string> = {
-      "Content-Type": "application/json",
-      "X-Request-Event": event.event,
-      "X-Request-Id": event.requestId
-    };
+  const response = await deliverJsonWebhook({
+    eventName: event.event,
+    requestId: event.requestId,
+    body: event,
+    config
+  });
 
-    if (config.webhookToken) {
-      headers.Authorization = `Bearer ${config.webhookToken}`;
-    }
-
-    const response = await fetch(config.webhookUrl, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(event)
-    });
-
-    if (!response.ok) {
-      return {
-        ok: false,
-        code: "delivery_failed" as const,
-        message: `${requestValidationMessages.deliveryFailed} Канал вернул статус ${response.status}.`
-      };
-    }
-
+  if (response.ok) {
     return {
       ok: true as const,
       message: requestValidationMessages.success,
       redirectTo: `/thanks?source=${encodeURIComponent(event.payload.source)}`
     };
-  } catch {
-    return {
-      ok: false,
-      code: "delivery_failed" as const,
-      message: `${requestValidationMessages.deliveryFailed} Проверьте доступность URL и сетевое соединение.`
-    };
   }
+
+  return {
+    ok: false,
+    code: "delivery_failed" as const,
+    message:
+      response.status && response.status !== 502
+        ? `${requestValidationMessages.deliveryFailed} Канал вернул статус ${response.status}.`
+        : `${requestValidationMessages.deliveryFailed} Проверьте доступность URL и сетевое соединение.`
+  };
 }
 
 export async function submitRequestSubmission(payload: RequestSubmissionPayload): Promise<RequestSubmissionResponse> {

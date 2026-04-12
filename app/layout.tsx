@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CartProvider } from "@/components/cart/cart-provider";
 import { Inter } from "next/font/google";
 import { SiteShell } from "@/components/layout/site-shell";
 import { RequestModalProvider } from "@/components/shared/request-modal";
@@ -20,7 +21,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ru">
       <body className={inter.className}>
         <RequestModalProvider>
-          <SiteShell>{children}</SiteShell>
+          <CartProvider>
+            <SiteShell>{children}</SiteShell>
+          </CartProvider>
         </RequestModalProvider>
       </body>
     </html>

@@ -12,3 +12,5 @@ coverage
 .env.*.local
 
 public/uploads/requests
+data/orders/*
+!data/orders/.gitkeep

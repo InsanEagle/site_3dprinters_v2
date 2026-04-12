@@ -47,6 +47,14 @@ export const categories: Category[] = [
 export const products: Product[] = [
   {
     slug: "dashboard-panel-replacement",
+    sku: "PANEL-001",
+    salesMode: "inquiry",
+    availability: "made_to_order",
+    deliveryClass: "standard",
+    pricing: {
+      type: "on_request",
+      note: "Цена уточняется после оценки параметров детали"
+    },
     name: "Панель салона под замену",
     category: "panels",
     categoryLabel: "Панели",
@@ -67,6 +75,16 @@ export const products: Product[] = [
   },
   {
     slug: "interior-trim-piece",
+    sku: "INTERIOR-001",
+    salesMode: "direct",
+    availability: "in_stock",
+    deliveryClass: "standard",
+    pricing: {
+      type: "fixed",
+      amount: 4900,
+      currency: "RUB",
+      note: "Фиксированная цена для базового варианта позиции"
+    },
     name: "Накладка элемента салона",
     category: "interior",
     categoryLabel: "Элементы салона",
@@ -87,6 +105,16 @@ export const products: Product[] = [
   },
   {
     slug: "fastener-set",
+    sku: "FASTENER-001",
+    salesMode: "direct",
+    availability: "in_stock",
+    deliveryClass: "standard",
+    pricing: {
+      type: "fixed",
+      amount: 1800,
+      currency: "RUB",
+      note: "Фиксированная цена для комплекта из наличия"
+    },
     name: "Комплект креплений / заглушек",
     category: "fasteners",
     categoryLabel: "Крепления и заглушки",
@@ -107,6 +135,17 @@ export const products: Product[] = [
   },
   {
     slug: "body-molding-part",
+    sku: "MOLDING-001",
+    salesMode: "marketplace",
+    availability: "on_request",
+    deliveryClass: "standard",
+    pricing: {
+      type: "on_request",
+      note: "Цена и доступность зависят от текущего канала продажи"
+    },
+    marketplace: {
+      provider: "ozon"
+    },
     name: "Молдинг кузова",
     category: "moldings",
     categoryLabel: "Молдинги",
@@ -127,6 +166,14 @@ export const products: Product[] = [
   },
   {
     slug: "custom-repair-part",
+    sku: "CUSTOM-001",
+    salesMode: "inquiry",
+    availability: "made_to_order",
+    deliveryClass: "standard",
+    pricing: {
+      type: "on_request",
+      note: "Цена формируется после оценки образца или исходных данных"
+    },
     name: "Редкая деталь под восстановление",
     category: "custom-parts",
     categoryLabel: "Детали под заказ",
@@ -147,6 +194,17 @@ export const products: Product[] = [
   },
   {
     slug: "spoiler-element",
+    sku: "SPOILER-001",
+    salesMode: "marketplace",
+    availability: "on_request",
+    deliveryClass: "standard",
+    pricing: {
+      type: "on_request",
+      note: "Цена уточняется по текущему marketplace-сценарию"
+    },
+    marketplace: {
+      provider: "ozon"
+    },
     name: "Небольшой спойлер / декоративный элемент",
     category: "spoilers",
     categoryLabel: "Спойлеры",

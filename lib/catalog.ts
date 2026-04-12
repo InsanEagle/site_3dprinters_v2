@@ -1,6 +1,6 @@
 import { getSafeText } from "@/lib/content";
 import { categories, products } from "@/data/site";
-import { Product } from "@/types";
+import { Product, ProductAvailabilityStatus, ProductSalesMode } from "@/types";
 
 export type CatalogFilters = {
   category?: string;
@@ -40,6 +40,150 @@ export function getProductImages(images: string[]) {
   });
 }
 
+const availabilityLabels: Record<ProductAvailabilityStatus, string> = {
+  in_stock: "В наличии",
+  made_to_order: "Под заказ",
+  out_of_stock: "Нет в наличии",
+  on_request: "Наличие уточняется"
+};
+
+const salesModeLabels: Record<ProductSalesMode, string> = {
+  direct: "Прямая продажа",
+  marketplace: "Маркетплейс",
+  inquiry: "По запросу"
+};
+
+export function getProductAvailabilityLabel(status: ProductAvailabilityStatus) {
+  return availabilityLabels[status];
+}
+
+export function getProductSalesModeLabel(mode: ProductSalesMode) {
+  return salesModeLabels[mode];
+}
+
+export function isDirectSaleProduct(product: Product) {
+  return product.salesMode === "direct";
+}
+
+export function isMarketplaceProduct(product: Product) {
+  return product.salesMode === "marketplace";
+}
+
+export function isInquiryProduct(product: Product) {
+  return product.salesMode === "inquiry";
+}
+
+export function hasProductFixedPrice(product: Product) {
+  return typeof product.pricing.amount === "number" && Number.isFinite(product.pricing.amount) && product.pricing.type !== "on_request";
+}
+
+export function getProductUnitPrice(product: Product) {
+  if (product.pricing.type !== "fixed") {
+    return undefined;
+  }
+
+  return hasProductFixedPrice(product) ? product.pricing.amount : undefined;
+}
+
+export function canProductBePurchasedDirectly(product: Product) {
+  return isDirectSaleProduct(product) && typeof getProductUnitPrice(product) === "number" && product.availability !== "out_of_stock";
+}
+
+export function getProductCartStatusMessage(product: Product) {
+  if (!isDirectSaleProduct(product)) {
+    return isMarketplaceProduct(product)
+      ? "Позиция покупается через marketplace-сценарий и не добавляется в корзину сайта."
+      : "Позиция оформляется через запрос, поэтому корзина для нее не используется.";
+  }
+
+  if (product.availability === "out_of_stock") {
+    return "Позиция временно недоступна, поэтому добавить ее в корзину нельзя.";
+  }
+
+  if (typeof getProductUnitPrice(product) !== "number") {
+    return getSafeText(product.pricing.note) ?? "Для этой позиции пока нет честной фиксированной цены, поэтому корзина не используется.";
+  }
+
+  return "Позицию можно добавить в корзину и сохранить для дальнейшего оформления.";
+}
+
+export function hasProductMarketplaceLink(product: Product) {
+  return Boolean(getSafeText(product.marketplace?.url));
+}
+
+export function getProductMarketplaceHref(product: Product) {
+  return getSafeText(product.marketplace?.url);
+}
+
+export function getProductPriceLabel(product: Product) {
+  const { pricing } = product;
+
+  if (pricing.type === "on_request") {
+    return getSafeText(pricing.note) ?? "Цена уточняется";
+  }
+
+  if (typeof pricing.amount !== "number" || !Number.isFinite(pricing.amount)) {
+    return getSafeText(pricing.note) ?? "Цена уточняется";
+  }
+
+  const formattedAmount = new Intl.NumberFormat("ru-RU").format(pricing.amount);
+  return pricing.type === "from" ? `от ${formattedAmount} ₽` : `${formattedAmount} ₽`;
+}
+
+export function getProductCommerceNote(product: Product) {
+  if (isDirectSaleProduct(product)) {
+    if (hasProductFixedPrice(product)) {
+      return "Позиция подготовлена под прямую продажу на сайте. Пока без корзины: заказ подтверждается вручную после запроса.";
+    }
+
+    return getSafeText(product.pricing.note) ?? "Позиция переведена в прямой сценарий, но итоговая цена пока подтверждается перед покупкой.";
+  }
+
+  if (isMarketplaceProduct(product)) {
+    return hasProductMarketplaceLink(product)
+      ? "Для этой позиции основным остается marketplace-сценарий. На сайте показываем товар и даем переход в актуальный канал покупки."
+      : "Для этой позиции сохраняем marketplace-first сценарий. Прямая покупка на сайте пока не является основным потоком.";
+  }
+
+  return "Для этой позиции сохраняется сценарий запроса: сначала уточняются параметры, затем подтверждается возможность изготовления или подбора.";
+}
+
+export function getProductScenarioLabel(product: Product) {
+  if (isDirectSaleProduct(product)) {
+    return "Можно заказать через сайт";
+  }
+
+  if (isMarketplaceProduct(product)) {
+    return "Покупка через маркетплейс";
+  }
+
+  return "Сначала уточняем задачу";
+}
+
+export function getProductCardHref(product: Product) {
+  if (isDirectSaleProduct(product)) {
+    return `/product/${product.slug}#purchase`;
+  }
+
+  if (isInquiryProduct(product)) {
+    return `/product/${product.slug}#request`;
+  }
+
+  return `/product/${product.slug}`;
+}
+
+export function getProductCardCtaLabel(product: Product) {
+  if (isDirectSaleProduct(product)) {
+    return hasProductFixedPrice(product) ? "Купить" : "Запросить покупку";
+  }
+
+  if (isMarketplaceProduct(product)) {
+    return hasProductMarketplaceLink(product) ? "Где купить" : "Уточнить сценарий";
+  }
+
+  return "Оставить запрос";
+}
+
 function matchesCatalogQuery(product: Product, query: string) {
   if (!query) {
     return true;
@@ -48,10 +192,12 @@ function matchesCatalogQuery(product: Product, query: string) {
   const normalizedQuery = query.toLowerCase();
   const searchIndex = [
     product.name,
+    product.sku,
     product.slug,
     product.categoryLabel,
     getSafeText(product.shortDescription),
-    getSafeText(product.material)
+    getSafeText(product.material),
+    getProductSalesModeLabel(product.salesMode)
   ]
     .filter(Boolean)
     .join(" ")

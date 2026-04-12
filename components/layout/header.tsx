@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useCart } from "@/components/cart/cart-provider";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
 import { brandContent } from "@/data/content";
@@ -23,11 +24,13 @@ const navigation = [
 
 export function Header() {
   const pathname = usePathname();
+  const { itemCount, isHydrated } = useCart();
   const { openModal } = useRequestModal();
   const companyName = getSafeText(siteConfig.name) ?? brandContent.workingTitle;
   const phone = getSafeText(siteConfig.phone);
   const phoneHref = getSafePhoneHref(siteConfig.phone);
   const headerCopy = getHeaderRequestFormText();
+  const cartCountLabel = isHydrated ? itemCount : 0;
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
@@ -51,6 +54,16 @@ export function Header() {
           ))}
         </nav>
         <div className="ml-auto flex items-center gap-3">
+          <Link
+            href="/cart"
+            className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm font-semibold text-ink transition hover:bg-white"
+            aria-label={`Корзина, товаров: ${cartCountLabel}`}
+          >
+            <span>Корзина</span>
+            <span className="inline-flex min-w-7 items-center justify-center rounded-full bg-white px-2 py-1 text-xs text-body">
+              {cartCountLabel}
+            </span>
+          </Link>
           {phone && phoneHref ? (
             <a href={phoneHref} className="hidden text-sm font-medium text-ink xl:block">
               {phone}
