@@ -1,8 +1,12 @@
 node_modules
 .next
+playwright-report
+test-results
 out
 dist
 coverage
 .DS_Store
 *.log
-
+.env
+.env.local
+.env.*.local

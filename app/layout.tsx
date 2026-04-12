@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import "./globals.css";
 import { Inter } from "next/font/google";
 import { SiteShell } from "@/components/layout/site-shell";
 import { RequestModalProvider } from "@/components/shared/request-modal";
-import { siteConfig } from "@/data/site";
+import { brandContent } from "@/data/content";
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -11,9 +11,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: `${siteConfig.shortName} | 3D-печатные автодетали и изготовление под заказ`,
-  description:
-    "MVP сайта для компании, которая продает 3D-печатные автомобильные детали, изготавливает изделия под заказ и выполняет 3D-сканирование."
+  title: brandContent.workingTitle,
+  description: brandContent.shortDescription
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -27,4 +26,3 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     </html>
   );
 }
-

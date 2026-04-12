@@ -2,11 +2,11 @@ import { Metadata } from "next";
 import { Container } from "@/components/shared/container";
 import { FAQAccordion } from "@/components/shared/faq-accordion";
 import { SectionTitle } from "@/components/shared/section-title";
-import { faqItems } from "@/data/site";
+import { faqContent } from "@/data/content";
 
 export const metadata: Metadata = {
-  title: "FAQ | AutoParts FDM",
-  description: "Ответы на частые вопросы по каталогу, изготовлению под заказ, 3D-сканированию, срокам и доставке."
+  title: "FAQ | Изготовление деталей",
+  description: "Ответы на частые вопросы по изготовлению деталей, 3D-печати, моделированию и подаче заявки."
 };
 
 export default function FaqPage() {
@@ -16,11 +16,10 @@ export default function FaqPage() {
         <SectionTitle
           eyebrow="FAQ"
           title="Частые вопросы"
-          description="Отдельная страница для вопросов, которые помогут пользователю быстрее понять, подходит ли ему готовая деталь, изготовление под заказ или 3D-сканирование."
+          description="Если вы только оцениваете задачу и не уверены, с чего начать, этот блок поможет быстрее понять формат обращения."
         />
-        <FAQAccordion items={faqItems} />
+        <FAQAccordion items={faqContent} />
       </Container>
     </div>
   );
 }
-

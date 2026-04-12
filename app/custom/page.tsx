@@ -8,25 +8,27 @@ import { HeroSection } from "@/components/shared/hero-section";
 import { RequestForm } from "@/components/shared/request-form";
 import { SectionTitle } from "@/components/shared/section-title";
 import { Timeline } from "@/components/shared/timeline";
-import { processSteps } from "@/data/site";
+import { formContent, homeContent, servicesContent } from "@/data/content";
+
+const service = servicesContent.find((item) => item.slug === "custom")!;
 
 export const metadata: Metadata = {
-  title: "Изготовление под заказ | AutoParts FDM",
-  description: "Страница услуги изготовления автомобильных деталей под заказ с понятным процессом и формой заявки."
+  title: `${service.title} | Изготовление деталей`,
+  description: service.shortText
 };
 
 export default function CustomPage() {
   return (
     <>
       <HeroSection
-        title="Изготовление автомобильных деталей под заказ"
-        description="Если нужной детали нет в продаже, она повреждена или снята с производства, мы можем изготовить её по образцу, фото, размерам или на основе 3D-сканирования."
+        title={service.bodyTitle}
+        description={service.bodyText}
         actions={<ServiceHeroActions source="custom" anchorId="custom-form" />}
         aside={
           <div className="rounded-[32px] border border-line bg-white p-6">
             <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Когда это подходит</p>
             <div className="mt-5 grid gap-3">
-              {["Детали нет в продаже", "Деталь повреждена", "Нужен нестандартный элемент"].map((item) => (
+              {service.bullets.map((item) => (
                 <div key={item} className="rounded-2xl bg-surface p-4 text-base font-medium text-ink">
                   {item}
                 </div>
@@ -38,15 +40,12 @@ export default function CustomPage() {
 
       <section className="py-16 sm:py-20">
         <Container>
-          <SectionTitle eyebrow="Что можно изготовить" title="Подходящие типы изделий" />
+          <SectionTitle eyebrow="Что можно прислать" title="С чего начать оценку" />
           <FeatureCards
             items={[
-              { title: "Элементы салона", description: "Рамки, накладки, панели, корпуса и другие интерьерные элементы." },
-              { title: "Крепления и заглушки", description: "Практичные детали, которые часто ломаются или теряются в эксплуатации." },
-              { title: "Детали кузова", description: "Отдельные пластиковые элементы, где важно аккуратно оценить применимость FDM-печати." },
-              { title: "Корпуса и кожухи", description: "Функциональные изделия с понятной геометрией и понятной задачей по эксплуатации." },
-              { title: "Редкие элементы", description: "Снятые с производства или труднонаходимые позиции под восстановление." },
-              { title: "Единичные изделия и небольшие партии", description: "Подходит не только для одной детали, но и для повторяемых задач в малом тираже." }
+              { title: "Образец детали", description: "Если сохранилась физическая деталь, этого часто достаточно для первичной оценки." },
+              { title: "Фото и размеры", description: "Если образца нет, можно начать с фотографий, примерных размеров и описания задачи." },
+              { title: "Готовая модель", description: "Если цифровая модель уже есть, можно быстрее перейти к обсуждению изготовления." }
             ]}
           />
         </Container>
@@ -54,8 +53,8 @@ export default function CustomPage() {
 
       <section className="border-y border-line bg-surface py-16 sm:py-20">
         <Container>
-          <SectionTitle eyebrow="Процесс" title="Как проходит работа" />
-          <Timeline steps={processSteps} />
+          <SectionTitle eyebrow="Процесс" title={homeContent.processTitle} />
+          <Timeline steps={homeContent.processSteps} />
         </Container>
       </section>
 
@@ -63,19 +62,15 @@ export default function CustomPage() {
         <Container>
           <div className="grid gap-8 lg:grid-cols-2">
             <div className="rounded-3xl border border-line bg-white p-8">
-              <h2 className="text-2xl font-semibold text-ink">Что желательно подготовить</h2>
-              <ul className="mt-5 grid gap-3 text-base leading-7 text-body">
-                <li>Фото детали</li>
-                <li>Марка и модель автомобиля</li>
-                <li>Размеры, если есть</li>
-                <li>Описание задачи</li>
-                <li>Образец детали, если сохранился</li>
-              </ul>
-            </div>
-            <div className="rounded-3xl border border-line bg-white p-8">
               <h2 className="text-2xl font-semibold text-ink">Что важно учитывать</h2>
               <p className="mt-4 text-base leading-7 text-body">
-                Не каждая деталь подходит для FDM-печати. Каждый запрос оценивается индивидуально: важны геометрия, нагрузка, температура, способ крепления и требования к внешнему виду.
+                Возможность повторения зависит от геометрии, состояния исходной детали, требований к установке и условий эксплуатации будущего изделия.
+              </p>
+            </div>
+            <div className="rounded-3xl border border-line bg-white p-8">
+              <h2 className="text-2xl font-semibold text-ink">Если данных пока мало</h2>
+              <p className="mt-4 text-base leading-7 text-body">
+                Это не мешает начать. Для первичной оценки часто достаточно описания проблемы, нескольких фотографий и примерного назначения детали.
               </p>
               <div className="mt-6">
                 <Button href="#custom-form" variant="secondary">Перейти к форме</Button>
@@ -85,35 +80,17 @@ export default function CustomPage() {
         </Container>
       </section>
 
-      <section className="border-y border-line bg-surface py-16 sm:py-20">
-        <Container>
-          <SectionTitle eyebrow="Примеры задач" title="Какие запросы можно приносить" />
-          <FeatureCards
-            items={[
-              { title: "Нужно повторить сломанную деталь", description: "Если есть образец или хотя бы его часть, шансы на восстановление заметно выше." },
-              { title: "Нужен редкий пластиковый элемент", description: "Подходит для деталей, которые трудно найти в продаже или на разборках." },
-              { title: "Нужен небольшой повторяемый тираж", description: "Если надо несколько одинаковых изделий, производство можно организовать серией." }
-            ]}
-          />
-        </Container>
-      </section>
-
       <section id="custom-form" className="py-16 sm:py-20">
         <Container>
-          <RequestForm
-            source="custom-page-form"
-            title="Заявка на изготовление под заказ"
-            description="Форма пока работает в mock-режиме, но структура уже подготовлена для дальнейшего подключения реальной отправки."
-          />
+          <RequestForm source="custom-page-form" title={formContent.titleDefault} description={formContent.introDefault} />
         </Container>
       </section>
 
       <CTASection
-        title="Если задача нестандартная, лучше показать её заранее"
-        description="Фото, размеры или образец детали помогут быстрее понять, можно ли изготовить изделие и какой путь будет оптимальным."
+        title="Если деталь повреждена или ее трудно найти, начните с описания задачи"
+        description="Можно приложить фото, размеры, образец или готовую модель. Дальше мы поможем уточнить, какой путь работы подойдет лучше."
         actions={<ServiceHeroActions source="custom-final" anchorId="custom-form" />}
       />
     </>
   );
 }
-

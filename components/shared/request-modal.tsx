@@ -43,7 +43,12 @@ export function RequestModalProvider({ children }: { children: ReactNode }) {
       {children}
       {state.open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-[32px] bg-white p-3">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="request-modal-title"
+            className="max-h-[90vh] w-full max-w-3xl overflow-auto rounded-[32px] bg-white p-3"
+          >
             <div className="mb-3 flex justify-end">
               <button
                 type="button"
@@ -59,6 +64,7 @@ export function RequestModalProvider({ children }: { children: ReactNode }) {
               title={state.title}
               productName={state.productName}
               compact
+              titleId="request-modal-title"
               onSuccess={value.closeModal}
             />
           </div>

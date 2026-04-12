@@ -8,24 +8,27 @@ import { HeroSection } from "@/components/shared/hero-section";
 import { RequestForm } from "@/components/shared/request-form";
 import { SectionTitle } from "@/components/shared/section-title";
 import { Timeline } from "@/components/shared/timeline";
+import { formContent, homeContent, servicesContent } from "@/data/content";
+
+const service = servicesContent.find((item) => item.slug === "3d-scan")!;
 
 export const metadata: Metadata = {
-  title: "3D-сканирование | AutoParts FDM",
-  description: "Страница услуги 3D-сканирования автомобильных деталей для восстановления, доработки и последующего производства."
+  title: `${service.title} | Изготовление деталей`,
+  description: service.shortText
 };
 
 export default function ScanPage() {
   return (
     <>
       <HeroSection
-        title="3D-сканирование автомобильных деталей"
-        description="Оцифровываем детали сложной формы для последующего восстановления, доработки и производства."
+        title={service.bodyTitle}
+        description={service.bodyText}
         actions={<ServiceHeroActions source="scan" anchorId="scan-form" />}
         aside={
           <div className="rounded-[32px] border border-line bg-white p-6">
-            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Когда нужен 3D-скан</p>
+            <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Когда это подходит</p>
             <div className="mt-5 grid gap-3">
-              {["Сложная форма детали", "Редкая или снятая с производства деталь", "Нужна доработка или повторение"].map((item) => (
+              {service.bullets.map((item) => (
                 <div key={item} className="rounded-2xl bg-surface p-4 text-base font-medium text-ink">
                   {item}
                 </div>
@@ -37,13 +40,12 @@ export default function ScanPage() {
 
       <section className="py-16 sm:py-20">
         <Container>
-          <SectionTitle eyebrow="Что дает 3D-сканирование" title="Цифровая основа для восстановления и производства" />
+          <SectionTitle eyebrow="Что дает этап сканирования" title="Цифровая основа для дальнейшей работы" />
           <FeatureCards
             items={[
-              { title: "Цифровую основу для работы", description: "Это отправная точка для анализа формы, доработки и повторного изготовления." },
-              { title: "Возможность восстановления", description: "Особенно полезно для редких деталей, которых больше нет в продаже." },
-              { title: "Возможность доработки модели", description: "После оцифровки можно внести корректировки под конкретную задачу." },
-              { title: "Подготовку к производству", description: "После обработки модель можно использовать в дальнейшем производственном цикле." }
+              { title: "Подготовка к изготовлению", description: "Цифровая модель может использоваться как этап перед доработкой и производством." },
+              { title: "Работа со сложной геометрией", description: "Подходит в случаях, когда по фото или размерам трудно точно описать форму изделия." },
+              { title: "Основа для доработки", description: "После подготовки цифровой модели можно обсуждать изменение конструкции и адаптацию под задачу." }
             ]}
           />
         </Container>
@@ -51,15 +53,8 @@ export default function ScanPage() {
 
       <section className="border-y border-line bg-surface py-16 sm:py-20">
         <Container>
-          <SectionTitle eyebrow="Процесс" title="Как проходит процесс" />
-          <Timeline
-            steps={[
-              "Вы присылаете фото, описание или саму деталь",
-              "Мы оцениваем, подходит ли задача для 3D-сканирования",
-              "Выполняем сканирование, чистим и подготавливаем цифровую основу",
-              "Используем результат для восстановления, доработки или производства"
-            ]}
-          />
+          <SectionTitle eyebrow="Процесс" title={homeContent.processTitle} />
+          <Timeline steps={homeContent.processSteps} />
         </Container>
       </section>
 
@@ -67,24 +62,18 @@ export default function ScanPage() {
         <Container>
           <div className="grid gap-8 lg:grid-cols-2">
             <div className="rounded-3xl border border-line bg-white p-8">
-              <h2 className="text-2xl font-semibold text-ink">Для каких задач подходит</h2>
+              <h2 className="text-2xl font-semibold text-ink">Что желательно подготовить</h2>
               <ul className="mt-5 grid gap-3 text-base leading-7 text-body">
-                <li>Сложные пластиковые детали с выраженной геометрией</li>
-                <li>Редкие и снятые с производства элементы</li>
-                <li>Повторение существующей детали с последующей доработкой</li>
-                <li>Подготовка основы для изготовления единичного изделия или небольшой серии</li>
+                <li>Фотографии изделия с нескольких ракурсов</li>
+                <li>Краткое описание задачи</li>
+                <li>Размеры, если они известны</li>
+                <li>Физический образец, если он сохранился</li>
               </ul>
             </div>
             <div className="rounded-3xl border border-line bg-white p-8">
-              <h2 className="text-2xl font-semibold text-ink">Что желательно подготовить</h2>
-              <ul className="mt-5 grid gap-3 text-base leading-7 text-body">
-                <li>Фото детали с нескольких ракурсов</li>
-                <li>Марка и модель автомобиля</li>
-                <li>Описание задачи: восстановление, повторение или доработка</li>
-                <li>Образец детали, если он сохранился</li>
-              </ul>
-              <p className="mt-6 text-base leading-7 text-body">
-                Важно учитывать, что не каждая деталь требует именно 3D-сканирования. Иногда быстрее и практичнее идти другим путем, поэтому оценка всегда индивидуальная.
+              <h2 className="text-2xl font-semibold text-ink">Что важно знать</h2>
+              <p className="mt-4 text-base leading-7 text-body">
+                3D-сканирование не всегда является единственным путем решения задачи. Иногда оно используется как промежуточный этап перед моделированием, доработкой и изготовлением.
               </p>
               <div className="mt-6">
                 <Button href="#scan-form" variant="secondary">Перейти к форме</Button>
@@ -94,32 +83,15 @@ export default function ScanPage() {
         </Container>
       </section>
 
-      <section className="border-y border-line bg-surface py-16 sm:py-20">
-        <Container>
-          <SectionTitle eyebrow="Примеры задач" title="Что можно решать через 3D-сканирование" />
-          <FeatureCards
-            items={[
-              { title: "Восстановление сложной детали", description: "Когда важно быстро получить цифровую основу для дальнейшей работы." },
-              { title: "Оцифровка редкого элемента", description: "Когда деталь нужно повторить или адаптировать под новый проект." },
-              { title: "Подготовка к малой серии", description: "Когда после сканирования и доработки нужна повторяемость изделий." }
-            ]}
-          />
-        </Container>
-      </section>
-
       <section id="scan-form" className="py-16 sm:py-20">
         <Container>
-          <RequestForm
-            source="scan-page-form"
-            title="Заявка на 3D-сканирование"
-            description="Форма готова для приема заявок. Позже сюда можно подключить API, CRM или отправку в почту / мессенджер."
-          />
+          <RequestForm source="scan-page-form" title={formContent.titleDefault} description={formContent.introDefault} />
         </Container>
       </section>
 
       <CTASection
-        title="Если деталь сложная по форме, лучше начать со сканирования"
-        description="Так проще оценить реальную геометрию, подготовить цифровую основу и выбрать корректный путь дальнейшего изготовления."
+        title="Если нет готовой модели, можно начать с фотографии или образца"
+        description="На этапе первичной оценки достаточно описать задачу и передать исходные данные в удобном формате."
         actions={<ServiceHeroActions source="scan-final" anchorId="scan-form" />}
       />
     </>

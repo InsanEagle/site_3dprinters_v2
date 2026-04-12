@@ -1,13 +1,21 @@
 import Link from "next/link";
 import { Category } from "@/types";
 
-export function CategoryGrid({ items }: { items: Category[] }) {
+export function CategoryGrid({
+  items,
+  counts,
+  searchQuery
+}: {
+  items: Category[];
+  counts?: Record<string, number>;
+  searchQuery?: string;
+}) {
   return (
     <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
       {items.map((item, index) => (
         <Link
           key={item.slug}
-          href={`/catalog/${item.slug}`}
+          href={searchQuery ? { pathname: `/catalog/${item.slug}`, query: { q: searchQuery } } : `/catalog/${item.slug}`}
           className="group rounded-3xl border border-line bg-white p-6 transition hover:-translate-y-0.5 hover:border-accent"
         >
           <div className="mb-6 flex h-40 items-end rounded-2xl bg-[linear-gradient(135deg,_#f6f7f8_0%,_#e5e7eb_100%)] p-4">
@@ -15,9 +23,11 @@ export function CategoryGrid({ items }: { items: Category[] }) {
           </div>
           <h3 className="text-xl font-semibold text-ink group-hover:text-accent">{item.title}</h3>
           <p className="mt-3 text-base leading-7 text-body">{item.description}</p>
+          {typeof counts?.[item.slug] === "number" ? (
+            <p className="mt-4 text-sm font-medium text-accent">Позиций в каталоге: {counts[item.slug]}</p>
+          ) : null}
         </Link>
       ))}
     </div>
   );
 }
-
