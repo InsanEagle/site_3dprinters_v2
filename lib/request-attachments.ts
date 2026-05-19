@@ -1,9 +1,10 @@
-﻿import { mkdir, rm, writeFile } from "fs/promises";
+import { mkdir, rm, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
+import { createRequestAttachmentAccessToken, getRequestAttachmentAccessConfig } from "@/lib/request-attachment-access";
 import { RequestAttachment } from "@/lib/request-submission";
 
-const REQUEST_UPLOAD_ROOT = path.join(process.cwd(), "public", "uploads", "requests");
+export const REQUEST_ATTACHMENTS_STORAGE_ROOT = path.join(process.cwd(), "data", "request-attachments");
 
 function sanitizeFileStem(fileName: string) {
   const stem = path.parse(fileName).name.toLowerCase().replace(/[^a-z0-9-_]+/g, "-").replace(/^-+|-+$/g, "");
@@ -28,8 +29,62 @@ function sanitizeExtension(fileName: string, contentType: string) {
   return ".jpg";
 }
 
-function toRelativeUploadUrl(relativeUrl: string) {
-  return relativeUrl.replaceAll(path.sep, "/");
+function toPosixPath(value: string) {
+  return value.replaceAll(path.sep, "/");
+}
+
+function createRequestAttachmentDownloadPath(storageKey: string) {
+  const normalizedKey = toPosixPath(storageKey).split("/").map(encodeURIComponent).join("/");
+  const basePath = `/api/request-attachments/${normalizedKey}`;
+  const accessConfig = getRequestAttachmentAccessConfig();
+
+  if (!accessConfig.enabled) {
+    return basePath;
+  }
+
+  const token = createRequestAttachmentAccessToken(storageKey);
+  return `${basePath}?access=${encodeURIComponent(token)}`;
+}
+
+export function normalizeRequestAttachmentStorageKey(value: string) {
+  const normalized = path.posix.normalize(value.trim().replaceAll("\\", "/")).replace(/^\/+/, "");
+
+  if (!normalized || normalized === "." || normalized.startsWith("../") || normalized.includes("/../")) {
+    return null;
+  }
+
+  return normalized;
+}
+
+export function resolveRequestAttachmentAbsolutePath(storageKey: string) {
+  const normalizedKey = normalizeRequestAttachmentStorageKey(storageKey);
+
+  if (!normalizedKey) {
+    return null;
+  }
+
+  const absolutePath = path.resolve(REQUEST_ATTACHMENTS_STORAGE_ROOT, normalizedKey);
+  const storageRoot = path.resolve(REQUEST_ATTACHMENTS_STORAGE_ROOT);
+
+  if (!absolutePath.startsWith(storageRoot)) {
+    return null;
+  }
+
+  return absolutePath;
+}
+
+export function getRequestAttachmentContentType(storageKey: string) {
+  const extension = path.extname(storageKey).toLowerCase();
+
+  if (extension === ".png") {
+    return "image/png";
+  }
+
+  if (extension === ".webp") {
+    return "image/webp";
+  }
+
+  return "image/jpeg";
 }
 
 export async function saveRequestAttachments(files: File[], requestUrl: string): Promise<RequestAttachment[]> {
@@ -38,7 +93,7 @@ export async function saveRequestAttachments(files: File[], requestUrl: string):
   }
 
   const bucket = new Date().toISOString().slice(0, 10);
-  const uploadDirectory = path.join(REQUEST_UPLOAD_ROOT, bucket);
+  const uploadDirectory = path.join(REQUEST_ATTACHMENTS_STORAGE_ROOT, bucket);
   await mkdir(uploadDirectory, { recursive: true });
 
   const origin = new URL(requestUrl).origin;
@@ -49,7 +104,8 @@ export async function saveRequestAttachments(files: File[], requestUrl: string):
     const safeStem = sanitizeFileStem(file.name);
     const storedFileName = `${Date.now()}-${randomUUID()}-${safeStem}${extension}`;
     const absolutePath = path.join(uploadDirectory, storedFileName);
-    const relativeUrl = toRelativeUploadUrl(path.join("/uploads/requests", bucket, storedFileName));
+    const storageKey = toPosixPath(path.posix.join(bucket, storedFileName));
+    const relativeUrl = createRequestAttachmentDownloadPath(storageKey);
 
     await writeFile(absolutePath, Buffer.from(await file.arrayBuffer()));
 
@@ -57,6 +113,7 @@ export async function saveRequestAttachments(files: File[], requestUrl: string):
       fileName: file.name,
       contentType: file.type,
       size: file.size,
+      storageKey,
       relativeUrl,
       url: new URL(relativeUrl, origin).toString()
     });
@@ -71,11 +128,9 @@ export async function removeSavedRequestAttachments(attachments: RequestAttachme
   }
 
   for (const attachment of attachments) {
-    const relativePath = attachment.relativeUrl.replace(/^\//, "");
-    const absolutePath = path.resolve(process.cwd(), relativePath);
-    const uploadRoot = path.resolve(REQUEST_UPLOAD_ROOT);
+    const absolutePath = resolveRequestAttachmentAbsolutePath(attachment.storageKey);
 
-    if (!absolutePath.startsWith(uploadRoot)) {
+    if (!absolutePath) {
       continue;
     }
 

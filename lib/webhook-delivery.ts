@@ -2,6 +2,21 @@ function normalizeText(value: unknown) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+const DEFAULT_WEBHOOK_TIMEOUT_MS = 10_000;
+const MIN_WEBHOOK_TIMEOUT_MS = 1_000;
+const MAX_WEBHOOK_TIMEOUT_MS = 30_000;
+
+function readWebhookTimeoutMs() {
+  const rawValue = normalizeText(process.env.REQUESTS_WEBHOOK_TIMEOUT_MS);
+  const parsedValue = Number(rawValue);
+
+  if (!Number.isFinite(parsedValue)) {
+    return DEFAULT_WEBHOOK_TIMEOUT_MS;
+  }
+
+  return Math.min(MAX_WEBHOOK_TIMEOUT_MS, Math.max(MIN_WEBHOOK_TIMEOUT_MS, Math.floor(parsedValue)));
+}
+
 export function getWebhookDeliveryConfig() {
   const webhookUrl = normalizeText(process.env.REQUESTS_WEBHOOK_URL);
   const webhookToken = normalizeText(process.env.REQUESTS_WEBHOOK_TOKEN);
@@ -11,6 +26,7 @@ export function getWebhookDeliveryConfig() {
     isConfigured: Boolean(webhookUrl),
     webhookUrl: webhookUrl || undefined,
     webhookToken: webhookToken || undefined,
+    timeoutMs: readWebhookTimeoutMs(),
     siteName
   };
 }
@@ -32,6 +48,9 @@ export async function deliverJsonWebhook(args: {
     };
   }
 
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), config.timeoutMs);
+
   try {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -46,7 +65,8 @@ export async function deliverJsonWebhook(args: {
     const response = await fetch(config.webhookUrl, {
       method: "POST",
       headers,
-      body: JSON.stringify(args.body)
+      body: JSON.stringify(args.body),
+      signal: controller.signal
     });
 
     if (!response.ok) {
@@ -70,5 +90,7 @@ export async function deliverJsonWebhook(args: {
       siteName: config.siteName,
       error: "Could not reach webhook endpoint."
     };
+  } finally {
+    clearTimeout(timeout);
   }
 }

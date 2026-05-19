@@ -1,5 +1,5 @@
 import path from "path";
-import { deliverJsonWebhook, getWebhookDeliveryConfig } from "@/lib/webhook-delivery";
+import { deliverOperationsEvent, getOperationsNotificationConfig } from "@/lib/operations-notifications";
 
 export const REQUEST_FIELD_NAMES = ["name", "contact", "details", "file"] as const;
 export const REQUEST_UPLOAD_MAX_FILES = 5;
@@ -19,6 +19,7 @@ export type RequestAttachment = {
   fileName: string;
   contentType: string;
   size: number;
+  storageKey: string;
   relativeUrl: string;
   url: string;
 };
@@ -63,7 +64,7 @@ export type RequestWebhookEvent = {
 const allowedExtensionsLabel = "JPG, PNG или WEBP";
 const maxFileSizeLabel = `${Math.round(REQUEST_UPLOAD_MAX_FILE_SIZE / (1024 * 1024))} МБ`;
 const maxFilesLabel = String(REQUEST_UPLOAD_MAX_FILES);
-const uploadDirLabel = path.posix.join("public", "uploads", "requests");
+const uploadDirLabel = path.posix.join("data", "request-attachments");
 
 export const requestValidationMessages = {
   nameRequired: "Укажите имя, чтобы мы понимали, как к вам обратиться.",
@@ -78,9 +79,9 @@ export const requestValidationMessages = {
   fileTooLarge: `Размер одного файла не должен превышать ${maxFileSizeLabel}.`,
   fileSaveError: `Не удалось подготовить фото к отправке. Попробуйте выбрать файлы заново или отправить заявку без них.`,
   formUnavailable:
-    "Отправка через сайт пока не подключена. Заявка не была отправлена. Добавьте webhook в env или используйте другой канал связи.",
+    "Отправка через сайт временно недоступна. Заявка не была отправлена. Пожалуйста, свяжитесь с нами другим способом.",
   deliveryFailed:
-    "Заявка не была доставлена в канал приема. Проверьте настройки webhook или попробуйте повторить отправку позже.",
+    "Заявка не была доставлена в канал приема. Попробуйте повторить отправку позже или свяжитесь с нами другим способом.",
   serverError: "Не удалось обработать заявку из-за технической ошибки. Попробуйте еще раз позже.",
   success: `Заявка отправлена. Мы получили запрос${uploadDirLabel ? " и прикрепленные фото, если они были добавлены" : ""}.`
 } as const;
@@ -115,17 +116,19 @@ function normalizeAttachments(value: unknown): RequestAttachment[] | undefined {
       const candidate = item as Partial<RequestAttachment>;
       const fileName = normalizeText(candidate.fileName);
       const contentType = normalizeText(candidate.contentType);
+      const storageKey = normalizeText(candidate.storageKey);
       const relativeUrl = normalizeText(candidate.relativeUrl);
       const url = normalizeText(candidate.url);
       const size = typeof candidate.size === "number" && Number.isFinite(candidate.size) ? candidate.size : 0;
 
-      if (!fileName || !contentType || !relativeUrl || !url || size <= 0) {
+      if (!fileName || !contentType || !storageKey || !relativeUrl || !url || size <= 0) {
         return null;
       }
 
       return {
         fileName,
         contentType,
+        storageKey,
         size,
         relativeUrl,
         url
@@ -236,7 +239,7 @@ export function validateRequestSubmission(payload: unknown): {
   };
 }
 
-export const getRequestSubmissionAvailability = getWebhookDeliveryConfig;
+export const getRequestSubmissionAvailability = getOperationsNotificationConfig;
 
 function buildWebhookEvent(payload: RequestSubmissionPayload, siteName: string): RequestWebhookEvent {
   return {
@@ -263,12 +266,7 @@ async function deliverRequestViaWebhook(
     };
   }
 
-  const response = await deliverJsonWebhook({
-    eventName: event.event,
-    requestId: event.requestId,
-    body: event,
-    config
-  });
+  const response = await deliverOperationsEvent(event);
 
   if (response.ok) {
     return {
@@ -281,10 +279,7 @@ async function deliverRequestViaWebhook(
   return {
     ok: false,
     code: "delivery_failed" as const,
-    message:
-      response.status && response.status !== 502
-        ? `${requestValidationMessages.deliveryFailed} Канал вернул статус ${response.status}.`
-        : `${requestValidationMessages.deliveryFailed} Проверьте доступность URL и сетевое соединение.`
+    message: requestValidationMessages.deliveryFailed
   };
 }
 
