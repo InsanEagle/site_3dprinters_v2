@@ -14,3 +14,17 @@ coverage
 public/uploads/requests
 data/orders/*
 !data/orders/.gitkeep
+
+# Runtime/private uploads
+data/request-attachments/*
+!data/request-attachments/.gitkeep
+
+# Temporary diagnostics/artifacts
+tmp-operations-log.jsonl
+tmp-screens/
+
+# TypeScript incremental cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
+
+design_refs
