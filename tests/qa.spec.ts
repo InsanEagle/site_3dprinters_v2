@@ -1,9 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
+import { e2eOrdersDir, e2eRequestAttachmentsDir } from "./e2e-storage";
 
 const sampleImagePath = path.join(process.cwd(), "tests", "fixtures", "sample-image.png");
-const ordersDirPath = path.join(process.cwd(), "data", "orders");
+const ordersDirPath = e2eOrdersDir;
 const internalPassword = "test-backoffice-password";
 const sampleProductSlug = "konsol-vozduhovod-dlya-avtomobilya-toyota-mark-2-cresta-chaser-kuzov-jzx100-kanc474";
 const sampleProductSku = "KANC474";
@@ -56,7 +57,7 @@ async function writeOrderFixture(orderId: string) {
   return record satisfies OrderFixture;
 }
 
-async function countRequestAttachmentFiles(root = path.join(process.cwd(), "data", "request-attachments")): Promise<number> {
+async function countRequestAttachmentFiles(root = e2eRequestAttachmentsDir): Promise<number> {
   let total = 0;
   const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
 
@@ -74,7 +75,7 @@ async function countRequestAttachmentFiles(root = path.join(process.cwd(), "data
   return total;
 }
 
-async function getLatestRequestAttachmentFile(root = path.join(process.cwd(), "data", "request-attachments")): Promise<string | undefined> {
+async function getLatestRequestAttachmentFile(root = e2eRequestAttachmentsDir): Promise<string | undefined> {
   const entries = await readdir(root, { withFileTypes: true }).catch(() => []);
   const files: string[] = [];
 

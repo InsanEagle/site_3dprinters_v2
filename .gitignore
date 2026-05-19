@@ -22,6 +22,7 @@ data/request-attachments/*
 # Temporary diagnostics/artifacts
 tmp-operations-log.jsonl
 tmp-screens/
+tmp/e2e/
 
 # TypeScript incremental cache
 tsconfig.tsbuildinfo

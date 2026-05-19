@@ -54,6 +54,8 @@ OPERATIONS_EMAIL_WEBHOOK_URL=
 OPERATIONS_EMAIL_WEBHOOK_TOKEN=
 OPERATIONS_SHEETS_WEBHOOK_URL=
 OPERATIONS_SHEETS_WEBHOOK_TOKEN=
+ORDERS_DATA_DIR=
+REQUEST_ATTACHMENTS_DIR=
 REQUEST_ATTACHMENTS_ACCESS_SECRET=
 INTERNAL_BACKOFFICE_PASSWORD=
 INTERNAL_BACKOFFICE_SESSION_SECRET=
@@ -70,6 +72,8 @@ ORDER_PUBLIC_ACCESS_SECRET=
 - `OPERATIONS_MESSENGER_WEBHOOK_URL` / `OPERATIONS_MESSENGER_WEBHOOK_TOKEN` — опциональный канал для уведомления в мессенджер через webhook-адаптер.
 - `OPERATIONS_EMAIL_WEBHOOK_URL` / `OPERATIONS_EMAIL_WEBHOOK_TOKEN` — опциональный канал для email-уведомления через webhook-адаптер.
 - `OPERATIONS_SHEETS_WEBHOOK_URL` / `OPERATIONS_SHEETS_WEBHOOK_TOKEN` — опциональный канал для записи в Google Sheets или аналогичную таблицу через webhook-адаптер.
+- `ORDERS_DATA_DIR` — опциональный override директории заказов; по умолчанию `data/orders`.
+- `REQUEST_ATTACHMENTS_DIR` — опциональный override директории вложений заявок; по умолчанию `data/request-attachments`.
 - `REQUEST_ATTACHMENTS_ACCESS_SECRET` — секрет для подписанных ссылок на приватные вложения заявок.
 - `INTERNAL_BACKOFFICE_PASSWORD` — пароль для внутреннего backoffice.
 - `INTERNAL_BACKOFFICE_SESSION_SECRET` — секрет cookie-сессии internal backoffice.
@@ -318,6 +322,7 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
 
 - `tests/qa.spec.ts` — компактный smoke-suite под текущий MVP;
 - покрывает главную, каталог, товар, корзину, checkout, форму заявки, internal login и public order status.
+- Playwright использует изолированные runtime-директории `tmp/e2e/orders` и `tmp/e2e/request-attachments`, чтобы не смешивать smoke-данные с локальными заказами и вложениями.
 
 Примечание по lint:
 

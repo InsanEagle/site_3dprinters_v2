@@ -3,8 +3,16 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { createRequestAttachmentAccessToken, getRequestAttachmentAccessConfig } from "@/lib/request-attachment-access";
 import { RequestAttachment } from "@/lib/request-submission";
+import { readEnvText } from "@/lib/runtime-env";
 
-export const REQUEST_ATTACHMENTS_STORAGE_ROOT = path.join(process.cwd(), "data", "request-attachments");
+function resolveStorageDir(envName: string, fallbackPath: string) {
+  const configuredPath = readEnvText(envName);
+  const storagePath = configuredPath || fallbackPath;
+
+  return path.isAbsolute(storagePath) ? storagePath : path.join(process.cwd(), storagePath);
+}
+
+export const REQUEST_ATTACHMENTS_STORAGE_ROOT = resolveStorageDir("REQUEST_ATTACHMENTS_DIR", path.join("data", "request-attachments"));
 
 function sanitizeFileStem(fileName: string) {
   const stem = path.parse(fileName).name.toLowerCase().replace(/[^a-z0-9-_]+/g, "-").replace(/^-+|-+$/g, "");

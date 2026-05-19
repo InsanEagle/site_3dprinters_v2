@@ -89,7 +89,7 @@ Remaining P0:
 ## 5. Known P1 issues
 
 - Add truthful Schema.org where useful.
-- Improve E2E isolation so tests do not write into the same operational data paths as local/manual data.
+- E2E isolation is implemented with `ORDERS_DATA_DIR`, `REQUEST_ATTACHMENTS_DIR`, and `tmp/e2e/*` test storage.
 - Clarify checkout as inquiry-first unless real direct-sale SKU data is ready.
 - Add or verify real Ozon URLs if marketplace handoff CTAs are used.
 - Review env/backoffice production setup and operational checklist.
@@ -136,10 +136,9 @@ Remaining P0:
 2. Add truthful Schema.org for Organization, Product where data is real, and FAQ if appropriate.
 3. Review checkout/product CTAs so the public flow stays inquiry-first unless direct-sale data is real.
 4. Add or verify real Ozon URLs before using marketplace handoff as a serious user path.
-5. Isolate E2E fixtures from operational `data/orders` and `data/request-attachments`.
-6. Review request handling after first production-like test: decide whether webhook-only is enough or a local request inbox is needed.
-7. Polish imported product descriptions and category grouping.
-8. Finalize production runbook details for reverse proxy, HTTPS, monitoring, and server backup schedule.
+5. Review request handling after first production-like test: decide whether webhook-only is enough or a local request inbox is needed.
+6. Polish imported product descriptions and category grouping.
+7. Finalize production runbook details for reverse proxy, HTTPS, monitoring, and server backup schedule.
 
 ## 10. Last audit summary
 

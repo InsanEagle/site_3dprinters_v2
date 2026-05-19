@@ -1,8 +1,16 @@
 import { mkdir, readdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { isOrderStatus, normalizeOrderNotificationStatus, OrderNotificationChannelState, OrderRecord, OrderStatus } from "@/lib/order-submission";
+import { readEnvText } from "@/lib/runtime-env";
 
-export const ORDERS_STORAGE_DIR = path.join(process.cwd(), "data", "orders");
+function resolveStorageDir(envName: string, fallbackPath: string) {
+  const configuredPath = readEnvText(envName);
+  const storagePath = configuredPath || fallbackPath;
+
+  return path.isAbsolute(storagePath) ? storagePath : path.join(process.cwd(), storagePath);
+}
+
+export const ORDERS_STORAGE_DIR = resolveStorageDir("ORDERS_DATA_DIR", path.join("data", "orders"));
 
 type StoredOrderRecord = Partial<OrderRecord> & {
   managerNotification?: Partial<OrderRecord["managerNotification"]> & {
