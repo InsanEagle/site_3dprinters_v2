@@ -38,7 +38,7 @@ Readiness estimates from the latest audit:
 
 Needs verification:
 
-- Final VPS/self-host production deployment shape.
+- Final VPS/self-host production deployment shape now has a minimal Docker contour, but needs a real VPS dry run.
 - Long-term persistence strategy for orders and request attachments.
 - Exact production webhook receiver implementation.
 
@@ -79,12 +79,12 @@ Current status:
 - Sitemap: added after audit.
 - Robots: added after audit.
 - Production request/env behavior: strengthened after audit. Missing or failed primary webhook does not produce fake success.
-- Docker/VPS readiness: still open.
+- Docker/VPS readiness: minimal Dockerfile, `.dockerignore`, compose, and README runbook added after audit.
 
 Remaining P0:
 
-- Docker/VPS readiness.
-- Production deployment/runbook for the current file-based storage model.
+- Real VPS dry run with production env, volumes, backup, restore, and webhook receiver.
+- Production deployment ownership/permissions verification for the current file-based storage model.
 
 ## 5. Known P1 issues
 
@@ -132,14 +132,14 @@ Remaining P0:
 
 ## 9. Current recommended roadmap
 
-1. Add minimal Docker/VPS readiness: Dockerfile, `.dockerignore`, compose or runbook, and production storage notes.
+1. Run a real VPS/container dry run with production env, mounted volumes, backup, restore, and webhook receiver.
 2. Add truthful Schema.org for Organization, Product where data is real, and FAQ if appropriate.
 3. Review checkout/product CTAs so the public flow stays inquiry-first unless direct-sale data is real.
 4. Add or verify real Ozon URLs before using marketplace handoff as a serious user path.
 5. Isolate E2E fixtures from operational `data/orders` and `data/request-attachments`.
 6. Review request handling after first production-like test: decide whether webhook-only is enough or a local request inbox is needed.
 7. Polish imported product descriptions and category grouping.
-8. Add production runbook for env, webhook receiver, backoffice password, file storage, backup, and deploy checks.
+8. Finalize production runbook details for reverse proxy, HTTPS, monitoring, and server backup schedule.
 
 ## 10. Last audit summary
 
@@ -150,7 +150,7 @@ The latest audit found a substantial MVP foundation:
 - The largest launch risks were operational and SEO-readiness gaps rather than lack of core pages.
 - Header responsiveness, lint, sitemap, robots, and production request behavior were identified as P0 items.
 - Several P0 items have since been addressed in follow-up tasks.
-- Docker/VPS readiness remains the main open P0 from that list.
+- Minimal Docker/VPS readiness has been added, but a real VPS dry run remains required before launch.
 
 Residual risk:
 

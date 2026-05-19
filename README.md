@@ -345,6 +345,92 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
    - `npm run build`
    - `npm run test:e2e`
 
+## Docker / VPS
+
+Минимальный production-контур использует standalone build Next.js без отдельной БД, nginx или HTTPS-слоя внутри приложения.
+
+### Локальная проверка образа
+
+```bash
+docker build -t autodetail-fdm-mvp .
+docker run --rm -p 3000:3000 --env-file .env.production -v ./data/orders:/app/data/orders -v ./data/request-attachments:/app/data/request-attachments autodetail-fdm-mvp
+```
+
+### Запуск через docker compose
+
+1. Создайте production env-файл вне Git, например `.env.production`, на основе `.env.example`.
+2. Убедитесь, что runtime-директории существуют:
+
+```bash
+mkdir -p data/orders data/request-attachments
+```
+
+3. Запустите:
+
+```bash
+docker compose --env-file .env.production up -d --build
+docker compose ps
+```
+
+По умолчанию контейнер слушает `3000`, а наружный порт задается через `APP_PORT` или остается `3000`.
+
+### Production env
+
+Для production обязательны:
+
+- `REQUESTS_WEBHOOK_URL`
+- `REQUEST_ATTACHMENTS_ACCESS_SECRET`
+- `INTERNAL_BACKOFFICE_PASSWORD`
+- `INTERNAL_BACKOFFICE_SESSION_SECRET`
+- `ORDER_PUBLIC_ACCESS_SECRET`
+
+Сильно рекомендуется:
+
+- `NEXT_PUBLIC_SITE_URL`
+- `APP_URL`
+- `REQUESTS_WEBHOOK_TOKEN`, если primary receiver требует bearer token
+
+Опциональные sidecar-каналы:
+
+- `OPERATIONS_MESSENGER_WEBHOOK_*`
+- `OPERATIONS_EMAIL_WEBHOOK_*`
+- `OPERATIONS_SHEETS_WEBHOOK_*`
+
+### Volumes
+
+`docker-compose.yml` монтирует два runtime-хранилища:
+
+- `./data/orders:/app/data/orders`
+- `./data/request-attachments:/app/data/request-attachments`
+
+Эти директории содержат рабочие данные MVP и должны переживать пересборку контейнера.
+
+На Linux/VPS убедитесь, что пользователь контейнера может писать в эти директории. Если нужны права вручную, выполните на сервере:
+
+```bash
+mkdir -p data/orders data/request-attachments
+sudo chown -R 1001:1001 data/orders data/request-attachments
+```
+
+### Backup / restore
+
+Минимальный backup перед деплоем или обновлением:
+
+```bash
+mkdir -p backups
+tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/request-attachments
+```
+
+Restore:
+
+```bash
+docker compose stop app
+tar -xzf backups/site-data-YYYYMMDD-HHMMSS.tar.gz
+docker compose up -d
+```
+
+После restore проверьте `/internal/orders` и отправку тестовой заявки.
+
 ## Что сейчас не реализовано
 
 - онлайн-оплата
