@@ -3,30 +3,57 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
 import { formContent, thanksContent } from "@/data/content";
 import { DeliveryMethod } from "@/lib/delivery";
+import { OrderNotificationStatus } from "@/lib/order-submission";
+import { getPublicOrderStatusHref, hasOrderPublicAccess } from "@/lib/order-status";
 
 export const metadata: Metadata = {
   title: "Спасибо за обращение | Изготовление деталей",
   description: thanksContent.text
 };
 
+function getOrderFlowCopy(deliveryStatus: OrderNotificationStatus | undefined) {
+  if (deliveryStatus === "delivered") {
+    return {
+      eyebrow: "Заказ отправлен",
+      title: "Спасибо, заказ сохранен и передан в обработку",
+      text: "Мы приняли заказ, зафиксировали его состав и передали данные менеджеру для ручного подтверждения следующего шага. Проверить статус можно по защищенной ссылке без отдельной регистрации."
+    };
+  }
+
+  return {
+    eyebrow: "Заказ сохранен",
+    title: "Спасибо, заказ надежно сохранен",
+    text: "Заказ уже зафиксирован во внутренней системе. Автоматическая передача менеджеру пока не подтвердилась, но заказ не потерян: его можно повторно доставить из внутреннего слоя без нового оформления."
+  };
+}
+
 export default async function ThanksPage({
   searchParams
 }: {
-  searchParams: Promise<{ source?: string; kind?: string; orderNumber?: string; deliveryMethod?: DeliveryMethod }>;
+  searchParams: Promise<{
+    source?: string;
+    kind?: string;
+    orderNumber?: string;
+    orderId?: string;
+    access?: string;
+    deliveryMethod?: DeliveryMethod;
+    deliveryStatus?: OrderNotificationStatus;
+  }>;
 }) {
-  const { source, kind, orderNumber, deliveryMethod } = await searchParams;
+  const { source, kind, orderNumber, orderId, access, deliveryMethod, deliveryStatus } = await searchParams;
   const isOrderFlow = kind === "order";
-  const eyebrow = isOrderFlow ? "Заказ отправлен" : formContent.successTitle;
-  const title = isOrderFlow ? "Спасибо, заказ принят в обработку" : thanksContent.title;
-  const text = isOrderFlow
-    ? "Мы приняли заказ в обработку, зафиксировали его состав и передали менеджеру данные для ручного подтверждения следующего шага. Автоматические этапы отслеживания на этом этапе еще не подключены."
-    : thanksContent.text;
+  const orderCopy = getOrderFlowCopy(deliveryStatus);
+  const eyebrow = isOrderFlow ? orderCopy.eyebrow : formContent.successTitle;
+  const title = isOrderFlow ? orderCopy.title : thanksContent.title;
+  const text = isOrderFlow ? orderCopy.text : thanksContent.text;
   const deliveryCopy =
     deliveryMethod === "pickup"
       ? "Самовывоз и детали передачи менеджер подтвердит вручную."
       : deliveryMethod === "delivery"
         ? "Стоимость и детали доставки менеджер подтвердит вручную после проверки заказа."
         : null;
+  const hasStatusAccess = Boolean(orderId && orderNumber && hasOrderPublicAccess({ id: orderId, orderNumber }, access));
+  const statusHref = hasStatusAccess ? getPublicOrderStatusHref({ id: orderId as string, orderNumber: orderNumber as string }) : undefined;
 
   return (
     <div className="py-24">
@@ -38,10 +65,20 @@ export default async function ThanksPage({
           {orderNumber ? <p className="mt-4 text-sm text-body">Номер заказа: {orderNumber}</p> : null}
           {deliveryCopy ? <p className="mt-2 text-sm text-body">Способ получения: {deliveryCopy}</p> : null}
           {source ? <p className="mt-4 text-sm text-body">Источник обращения: {source}</p> : null}
+          {statusHref ? (
+            <p className="mt-4 text-sm text-body">
+              Сохраните эту ссылку: она откроет текущий статус заказа позже без отдельной регистрации.
+            </p>
+          ) : isOrderFlow ? (
+            <p className="mt-4 text-sm text-body">
+              Публичная ссылка статуса может быть недоступна, если в окружении не настроен отдельный секрет для order access.
+            </p>
+          ) : null}
           <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+            {statusHref ? <Button href={statusHref}>Открыть статус заказа</Button> : null}
             <Button href="/">На главную</Button>
             <Button href="/catalog" variant="secondary">
-              Смотреть каталог
+              Открыть каталог
             </Button>
           </div>
         </div>

@@ -8,12 +8,12 @@ import {
   validateOrderSubmission
 } from "@/lib/order-submission";
 import {
+  createExistingOrderResponse,
   createOrderRecord,
-  markOrderNotificationDelivered,
-  markOrderNotificationFailed,
-  submitOrderSubmission
+  createOrderSubmissionFingerprint,
+  deliverSavedOrder
 } from "@/lib/order-processing";
-import { saveOrderRecord } from "@/lib/orders-store";
+import { findOrderRecordByIdempotencyKey, saveOrderRecord } from "@/lib/orders-store";
 
 export async function POST(request: Request) {
   let payload: unknown;
@@ -38,7 +38,7 @@ export async function POST(request: Request) {
       {
         ok: false,
         code: "validation_error",
-        message: "Проверьте обязательные поля checkout и попробуйте снова.",
+        message: validation.message ?? "Проверьте обязательные поля checkout и попробуйте снова.",
         fieldErrors: validation.fieldErrors
       },
       { status: 400 }
@@ -107,45 +107,72 @@ export async function POST(request: Request) {
     );
   }
 
-  const orderRecord = createOrderRecord({
-    source: validation.data.source,
-    customer: validation.data.customer,
-    delivery: {
-      method: deliverySelection.selectedMethod,
-      label: deliverySelection.deliveryLabel,
-      note: deliverySelection.deliveryNote,
-      fee: deliverySelection.deliveryFee,
-      commercialNote: deliverySelection.commercialNote,
-      fulfillmentNote: deliverySelection.fulfillmentNote
-    },
-    items: orderItems,
-    subtotal: cartSummary.subtotal
-  });
+  const submissionFingerprint = createOrderSubmissionFingerprint(validation.data);
+  const idempotencyKey = validation.data.idempotencyKey;
 
   try {
-    await saveOrderRecord(orderRecord);
+    if (idempotencyKey) {
+      const existingOrder = await findOrderRecordByIdempotencyKey(idempotencyKey);
 
-    const result = await submitOrderSubmission(orderRecord);
-    const nextRecord = result.ok
-      ? markOrderNotificationDelivered(orderRecord)
-      : markOrderNotificationFailed(orderRecord, result.message);
+      if (existingOrder) {
+        if (existingOrder.submissionFingerprint && existingOrder.submissionFingerprint !== submissionFingerprint) {
+          return NextResponse.json<OrderSubmissionResponse>(
+            {
+              ok: false,
+              code: "validation_error",
+              message: orderValidationMessages.duplicateConflict,
+              fieldErrors: {
+                idempotencyKey: orderValidationMessages.duplicateConflict
+              }
+            },
+            { status: 409 }
+          );
+        }
 
-    await saveOrderRecord(nextRecord);
+        if (existingOrder.managerNotification.status === "delivered") {
+          return NextResponse.json<OrderSubmissionResponse>(createExistingOrderResponse(existingOrder), { status: 200 });
+        }
 
-    if (!result.ok) {
-      const status =
-        result.code === "validation_error"
-          ? 400
-          : result.code === "submission_unavailable"
-            ? 503
-            : result.code === "delivery_failed"
-              ? 502
-              : 500;
+        const retriedDelivery = await deliverSavedOrder(existingOrder);
+        await saveOrderRecord(retriedDelivery.record);
 
-      return NextResponse.json<OrderSubmissionResponse>(result, { status });
+        if (!retriedDelivery.response.ok) {
+          return NextResponse.json<OrderSubmissionResponse>(retriedDelivery.response, { status: 500 });
+        }
+
+        return NextResponse.json<OrderSubmissionResponse>(
+          {
+            ...retriedDelivery.response,
+            wasDeduplicated: true
+          },
+          { status: 200 }
+        );
+      }
     }
 
-    return NextResponse.json<OrderSubmissionResponse>(result, { status: 201 });
+    const orderRecord = createOrderRecord({
+      source: validation.data.source,
+      customer: validation.data.customer,
+      delivery: {
+        method: deliverySelection.selectedMethod,
+        label: deliverySelection.deliveryLabel,
+        note: deliverySelection.deliveryNote,
+        fee: deliverySelection.deliveryFee,
+        commercialNote: deliverySelection.commercialNote,
+        fulfillmentNote: deliverySelection.fulfillmentNote
+      },
+      items: orderItems,
+      subtotal: cartSummary.subtotal,
+      idempotencyKey,
+      submissionFingerprint
+    });
+
+    await saveOrderRecord(orderRecord);
+
+    const deliveryResult = await deliverSavedOrder(orderRecord);
+    await saveOrderRecord(deliveryResult.record);
+
+    return NextResponse.json<OrderSubmissionResponse>(deliveryResult.response, { status: 201 });
   } catch {
     return NextResponse.json<OrderSubmissionResponse>(
       {

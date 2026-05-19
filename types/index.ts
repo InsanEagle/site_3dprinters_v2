@@ -38,6 +38,7 @@ export type Product = {
   color: string;
   leadTime: string;
   images: string[];
+  imageTone?: "neutral" | "dark";
   shortDescription: string;
   description: string;
   installation: string;

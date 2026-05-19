@@ -23,6 +23,7 @@ type CheckoutStatus =
   | { type: "error"; message: string; code?: Extract<OrderSubmissionResponse, { ok: false }>["code"] }
   | { type: "success"; message: string };
 
+const CHECKOUT_IDEMPOTENCY_STORAGE_KEY = "checkout:idempotency";
 const emptyErrors: OrderFieldErrors = {};
 
 function formatAmount(value: number) {
@@ -31,6 +32,80 @@ function formatAmount(value: number) {
 
 function getMethodDescription(option: DeliveryMethodOption) {
   return `${option.description} ${option.note}`;
+}
+
+function createCheckoutSignature(
+  items: Array<{
+    slug: string;
+    quantity: number;
+  }>,
+  values: CheckoutValues
+) {
+  return JSON.stringify({
+    items: items.map((item) => ({
+      slug: item.slug,
+      quantity: item.quantity
+    })),
+    customer: {
+      name: values.name.trim(),
+      contact: values.contact.trim(),
+      city: values.city.trim(),
+      address: values.address.trim(),
+      deliveryMethod: values.deliveryMethod,
+      comment: values.comment.trim()
+    }
+  });
+}
+
+function getCheckoutIdempotencyKey(signature: string) {
+  if (typeof window === "undefined") {
+    return `checkout-${Date.now()}`;
+  }
+
+  try {
+    const storedValue = window.sessionStorage.getItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
+
+    if (storedValue) {
+      const parsed = JSON.parse(storedValue) as {
+        signature?: string;
+        key?: string;
+      };
+
+      if (parsed.signature === signature && parsed.key) {
+        return parsed.key;
+      }
+    }
+  } catch {
+    // Ignore broken session storage payload and create a new key below.
+  }
+
+  const key = typeof window.crypto?.randomUUID === "function" ? `checkout-${window.crypto.randomUUID()}` : `checkout-${Date.now()}`;
+
+  try {
+    window.sessionStorage.setItem(
+      CHECKOUT_IDEMPOTENCY_STORAGE_KEY,
+      JSON.stringify({
+        signature,
+        key
+      })
+    );
+  } catch {
+    // Storage issues should not block checkout submission.
+  }
+
+  return key;
+}
+
+function clearCheckoutIdempotencyKey() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    window.sessionStorage.removeItem(CHECKOUT_IDEMPOTENCY_STORAGE_KEY);
+  } catch {
+    // Ignore storage cleanup failures.
+  }
 }
 
 export function CheckoutPageContent() {
@@ -114,10 +189,11 @@ export function CheckoutPageContent() {
     setFieldErrors(emptyErrors);
     setStatus({
       type: "loading",
-      message: "Проверяем корзину и отправляем заказ..."
+      message: "Фиксируем заказ и передаем его в обработку..."
     });
 
     try {
+      const idempotencyKey = getCheckoutIdempotencyKey(createCheckoutSignature(checkoutItems, values));
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: {
@@ -125,6 +201,7 @@ export function CheckoutPageContent() {
         },
         body: JSON.stringify({
           source: "checkout-page",
+          idempotencyKey,
           items: checkoutItems.map((item) => ({
             slug: item.slug,
             quantity: item.quantity
@@ -156,6 +233,7 @@ export function CheckoutPageContent() {
         type: "success",
         message: result.message
       });
+      clearCheckoutIdempotencyKey();
       clearCart();
       router.push(result.redirectTo ?? "/thanks?source=checkout-page&kind=order");
     } catch {
@@ -169,7 +247,7 @@ export function CheckoutPageContent() {
   if (!isHydrated) {
     return (
       <section className="rounded-[32px] border border-line bg-white p-8">
-        <p className="text-base leading-7 text-body">Загружаем checkout…</p>
+        <p className="text-base leading-7 text-body">Загружаем checkout...</p>
       </section>
     );
   }
@@ -178,9 +256,9 @@ export function CheckoutPageContent() {
     return (
       <section className="rounded-[32px] border border-line bg-white p-8 sm:p-10">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Checkout недоступен</p>
-        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">В корзине пока нет товаров для оформления</h1>
+        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Основной сценарий первого запуска — не onsite checkout</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-body">
-          Сначала добавьте direct-sale позиции с фиксированной ценой. Marketplace и inquiry товары по-прежнему оформляются вне onsite checkout.
+          Сейчас сайт в первую очередь помогает подобрать позицию, отправить заявку и перейти в актуальный канал покупки. Checkout сохранен как подготовленный слой для ограниченного direct-sale ассортимента, но не является основным публичным сценарием.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Button href="/catalog">Перейти в каталог</Button>
@@ -196,11 +274,11 @@ export function CheckoutPageContent() {
     return (
       <section className="rounded-[32px] border border-line bg-white p-8 sm:p-10">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Checkout требует проверки</p>
-        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Часть корзины больше нельзя оформить напрямую</h1>
+        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Для этого набора товаров прямое оформление сейчас не подходит</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-body">
           {invalidItemCount > 0
             ? `Корзина пересчиталась по актуальному каталогу. Сейчас есть невалидные позиции: ${invalidItemCount}. Удалите их или вернитесь к карточкам товаров, чтобы продолжить оформление честно.`
-            : `${deliverySummary.summary} ${deliverySummary.manualReviewNote ?? "Для этого набора товаров onsite checkout временно не обещает неподтвержденный способ получения."}`}
+            : `${deliverySummary.summary} ${deliverySummary.manualReviewNote ?? "Для этого набора товаров основной сценарий остается заявочным: сначала подтверждаем параметры и способ получения вручную."}`}
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Button href="/cart">Вернуться в корзину</Button>
@@ -214,11 +292,11 @@ export function CheckoutPageContent() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_360px]">
-      <form onSubmit={handleSubmit} noValidate className="rounded-[32px] border border-line bg-white p-6 sm:p-8">
+      <form onSubmit={handleSubmit} noValidate data-testid="checkout-form" className="rounded-[32px] border border-line bg-white p-6 sm:p-8">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Checkout</p>
-        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Короткое оформление без регистрации</h1>
+        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Оформление ограниченного direct-sale набора</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-body">
-          После отправки мы фиксируем состав заказа и связываемся для подтверждения доставки, сроков и следующего шага. Автоматический расчет доставки пока не обещаем.
+          Этот экран используется только для позиций, которые можно честно оформить через сайт без онлайн-оплаты. После отправки мы фиксируем заказ и связываемся для подтверждения доставки, сроков и следующего шага. Основной сценарий каталога по-прежнему остается inquiry-first.
         </p>
 
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -227,6 +305,7 @@ export function CheckoutPageContent() {
             <input
               required
               name="name"
+              data-testid="checkout-name"
               value={values.name}
               onChange={handleChange}
               aria-invalid={Boolean(fieldErrors.name)}
@@ -240,6 +319,7 @@ export function CheckoutPageContent() {
             <input
               required
               name="contact"
+              data-testid="checkout-contact"
               value={values.contact}
               onChange={handleChange}
               aria-invalid={Boolean(fieldErrors.contact)}
@@ -253,6 +333,7 @@ export function CheckoutPageContent() {
             <input
               required
               name="city"
+              data-testid="checkout-city"
               value={values.city}
               onChange={handleChange}
               aria-invalid={Boolean(fieldErrors.city)}
@@ -270,6 +351,7 @@ export function CheckoutPageContent() {
                     type="radio"
                     name="deliveryMethod"
                     value={option.method}
+                    data-testid={`checkout-delivery-${option.method}`}
                     checked={values.deliveryMethod === option.method}
                     onChange={() => handleDeliveryMethodChange(option.method)}
                     className="mt-1"
@@ -290,6 +372,7 @@ export function CheckoutPageContent() {
             {selectedDeliveryOption?.requiresAddress ? "Адрес доставки" : "Адрес или ориентир при необходимости"}
             <input
               name="address"
+              data-testid="checkout-address"
               required={selectedDeliveryOption?.requiresAddress}
               value={values.address}
               onChange={handleChange}
@@ -308,6 +391,7 @@ export function CheckoutPageContent() {
             Комментарий к заказу
             <textarea
               name="comment"
+              data-testid="checkout-comment"
               rows={4}
               value={values.comment}
               onChange={handleChange}
@@ -361,7 +445,7 @@ export function CheckoutPageContent() {
 
         <div className="mt-6 flex flex-col gap-4">
           {status.type === "error" ? (
-            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+            <div data-testid="checkout-error" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
               <p>{status.message}</p>
               {status.code === "checkout_unavailable" || status.code === "submission_unavailable" || status.code === "delivery_failed" || status.code === "server_error" ? (
                 <div className="mt-3 flex flex-col gap-3 sm:flex-row">
@@ -377,15 +461,17 @@ export function CheckoutPageContent() {
           ) : null}
 
           {status.type === "success" ? (
-            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-700">
+            <div data-testid="checkout-success" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-700">
               {status.message}
             </div>
           ) : null}
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm leading-6 text-body">Заказ отправляется только после успешного ответа сервера. Контекст корзины при ошибке не теряется.</p>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Отправляем заказ..." : "Оформить заказ"}
+            <p className="text-sm leading-6 text-body">
+              Сначала заказ надежно сохраняется во внутреннем слое. Если автоматическая доставка менеджеру задержится, заказ не потеряется и его можно будет безопасно повторить без новых дублей.
+            </p>
+            <Button type="submit" disabled={isSubmitting} data-testid="checkout-submit">
+              {isSubmitting ? "Сохраняем заказ..." : "Оформить заказ"}
             </Button>
           </div>
         </div>
