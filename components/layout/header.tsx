@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -31,15 +31,16 @@ export function Header() {
   const phoneHref = getSafePhoneHref(siteConfig.phone);
   const headerCopy = getHeaderRequestFormText();
   const cartCountLabel = isHydrated ? itemCount : 0;
+  const shouldShowCartLink = cartCountLabel > 0 || pathname === "/cart" || pathname === "/checkout";
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
-      <Container className="flex min-h-20 items-center gap-6 py-3">
-        <Link href="/" className="shrink-0">
-          <span className="block text-lg font-semibold text-ink">{companyName}</span>
-          <span className="block text-xs uppercase tracking-[0.12em] text-body">Пластиковые детали и изделия на заказ</span>
+      <Container className="flex min-h-20 min-w-0 items-center gap-3 py-3 sm:gap-4 xl:gap-5">
+        <Link href="/" className="min-w-0 flex-1 xl:flex-none xl:shrink-0">
+          <span className="block truncate text-lg font-semibold text-ink">{companyName}</span>
+          <span className="block truncate text-xs uppercase tracking-[0.12em] text-body">Пластиковые детали и изделия на заказ</span>
         </Link>
-        <nav className="hidden flex-1 items-center justify-center gap-6 lg:flex">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-4 xl:flex 2xl:gap-6">
           {navigation.map((item) => (
             <Link
               key={item.href}
@@ -53,27 +54,31 @@ export function Header() {
             </Link>
           ))}
         </nav>
-        <div className="ml-auto flex items-center gap-3">
-          <Link
-            href="/cart"
-            className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm font-semibold text-ink transition hover:bg-white"
-            aria-label={`Корзина, товаров: ${cartCountLabel}`}
-          >
-            <span>Корзина</span>
-            <span className="inline-flex min-w-7 items-center justify-center rounded-full bg-white px-2 py-1 text-xs text-body">
-              {cartCountLabel}
-            </span>
-          </Link>
+        <div className="ml-auto hidden shrink-0 items-center gap-2 sm:flex xl:gap-3">
+          {shouldShowCartLink ? (
+            <Link
+              href="/cart"
+              className="inline-flex items-center gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-sm font-semibold text-ink transition hover:bg-white"
+              aria-label={`Корзина, товаров: ${cartCountLabel}`}
+            >
+              <span>Корзина</span>
+              <span className="inline-flex min-w-7 items-center justify-center rounded-full bg-white px-2 py-1 text-xs text-body">
+                {cartCountLabel}
+              </span>
+            </Link>
+          ) : null}
           {phone && phoneHref ? (
             <a href={phoneHref} className="hidden text-sm font-medium text-ink xl:block">
               {phone}
             </a>
           ) : null}
-          <Button onClick={() => openModal({ ...headerCopy, source: `header:${pathname}` })}>Оставить заявку</Button>
+          <Button onClick={() => openModal({ ...headerCopy, source: `header:${pathname}` })}>
+            Оставить заявку
+          </Button>
         </div>
       </Container>
-      <div className="border-t border-line lg:hidden">
-        <Container className="flex gap-4 overflow-x-auto py-3">
+      <div className="overflow-hidden border-t border-line xl:hidden">
+        <Container className="flex min-w-0 gap-4 overflow-x-auto py-3">
           {navigation.map((item) => (
             <Link key={item.href} href={item.href} className="shrink-0 text-sm font-medium text-body">
               {item.label}
