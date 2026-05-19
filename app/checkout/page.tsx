@@ -4,7 +4,7 @@ import { Container } from "@/components/shared/container";
 
 export const metadata: Metadata = {
   title: "Checkout | Изготовление деталей",
-  description: "Короткий checkout для direct-sale товаров с фиксированной ценой."
+  description: "Короткий checkout только для ограниченного direct-sale ассортимента. Основной публичный поток сайта остается inquiry-first."
 };
 
 export default function CheckoutPage() {

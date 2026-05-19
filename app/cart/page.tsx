@@ -4,7 +4,7 @@ import { Container } from "@/components/shared/container";
 
 export const metadata: Metadata = {
   title: "Корзина | Изготовление деталей",
-  description: "Корзина для direct-sale позиций с фиксированной ценой."
+  description: "Корзина для ограниченного direct-sale ассортимента. Основной публичный сценарий сайта — подбор, заявка и уточнение по позиции."
 };
 
 export default function CartPage() {

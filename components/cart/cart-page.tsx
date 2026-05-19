@@ -23,14 +23,14 @@ export function CartPageContent() {
     return (
       <section className="rounded-[32px] border border-line bg-white p-8 sm:p-10">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Корзина пуста</p>
-        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Пока в корзине нет товаров</h1>
+        <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Сейчас основной сценарий сайта — запрос и подбор</h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-body">
-          Добавляйте сюда direct-sale позиции с фиксированной ценой. Marketplace и inquiry-сценарии по-прежнему остаются вне корзины.
+          На первом запуске каталог работает как витрина позиций, заявочный канал и точка перехода в маркетплейс. Корзина остается подготовленным слоем для ограниченного direct-sale ассортимента и не является основным публичным сценарием.
         </p>
         <div className="mt-6 flex flex-col gap-3 sm:flex-row">
           <Button href="/catalog">Перейти в каталог</Button>
           <Button href="/contacts" variant="secondary">
-            Задать вопрос
+            Оставить заявку
           </Button>
         </div>
       </section>
@@ -38,8 +38,8 @@ export function CartPageContent() {
   }
 
   return (
-    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-      <section className="space-y-4">
+    <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]" data-testid="cart-page">
+      <section className="space-y-4" data-testid="cart-items">
         <div className="rounded-[32px] border border-line bg-white p-6 sm:p-8">
           <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Корзина</p>
           <h1 className="mt-3 text-3xl font-semibold text-ink sm:text-4xl">Товары, выбранные для прямой покупки</h1>
@@ -49,7 +49,7 @@ export function CartPageContent() {
         </div>
 
         {items.map((item) => (
-          <article key={item.slug} className="rounded-[32px] border border-line bg-white p-5 sm:p-6">
+          <article key={item.slug} data-testid={`cart-item-${item.slug}`} className="rounded-[32px] border border-line bg-white p-5 sm:p-6">
             <div className="flex flex-col gap-5 sm:flex-row">
               <div className="overflow-hidden rounded-2xl border border-line bg-surface sm:w-40">
                 {item.image ? (
@@ -126,14 +126,14 @@ export function CartPageContent() {
         ))}
       </section>
 
-      <aside className="h-fit rounded-[32px] border border-line bg-white p-6 sm:p-8 lg:sticky lg:top-28">
+      <aside className="h-fit rounded-[32px] border border-line bg-white p-6 sm:p-8 lg:sticky lg:top-28" data-testid="cart-summary">
         <p className="text-sm font-semibold uppercase tracking-[0.12em] text-accent">Итого</p>
         <div className="mt-4 flex items-end justify-between gap-4">
           <span className="text-base text-body">Subtotal</span>
           <span className="text-3xl font-semibold text-ink">{formatAmount(subtotal)} ₽</span>
         </div>
         <p className="mt-3 text-sm leading-6 text-body">
-          В subtotal сейчас входят только позиции, которые можно честно купить на сайте без дополнительного уточнения: {subtotalCount}.
+          В subtotal сейчас входят только позиции, которые можно честно купить на сайте без дополнительного уточнения: {subtotalCount}. На первом релизе это ограниченный сценарий, а основной публичный поток остается inquiry-first.
         </p>
         <div className="mt-4 rounded-2xl border border-line bg-surface px-4 py-3 text-sm leading-6 text-body">
           <p>{deliverySummary.summary}</p>
@@ -141,16 +141,16 @@ export function CartPageContent() {
         </div>
         <p className={`mt-4 rounded-2xl px-4 py-3 text-sm leading-6 ${canCheckout ? "border border-line bg-surface text-body" : "border border-amber-200 bg-amber-50 text-amber-900"}`}>
           {canCheckout
-            ? "Checkout уже доступен: можно перейти к короткому оформлению без регистрации."
+            ? "Для этого ограниченного набора позиций checkout уже доступен: можно перейти к короткому оформлению без регистрации."
             : invalidItemCount > 0
               ? `Checkout пока заблокирован, потому что в корзине есть невалидные для прямой покупки позиции: ${invalidItemCount}.`
-              : "Checkout пока заблокирован, потому что для текущего набора товаров нужен ручной выбор способа получения вне onsite flow."}
+              : "Checkout пока заблокирован, потому что для текущего набора товаров основной сценарий остается ручным: через запрос, уточнение и подтверждение вне onsite flow."}
         </p>
         <div className="mt-6 flex flex-col gap-3">
           {canCheckout ? (
-            <Button href="/checkout">Перейти к checkout</Button>
+            <Button href="/checkout" data-testid="cart-go-to-checkout">Перейти к checkout</Button>
           ) : (
-            <Button href="/catalog">Продолжить выбор</Button>
+            <Button href="/catalog" data-testid="cart-continue-shopping">Продолжить выбор</Button>
           )}
           <Button href="/contacts" variant="secondary">
             Уточнить детали заказа
