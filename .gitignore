@@ -28,3 +28,7 @@ tsconfig.tsbuildinfo
 *.tsbuildinfo
 
 design_refs
+
+# Raw marketplace exports / local import inputs
+ozon_data/*
+!ozon_data/.gitkeep
