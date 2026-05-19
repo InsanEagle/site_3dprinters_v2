@@ -7,6 +7,7 @@ type ButtonProps = {
   href?: string;
   variant?: "primary" | "secondary" | "ghost";
   className?: string;
+  "data-testid"?: string;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
 const variants = {
@@ -30,7 +31,7 @@ export function Button({
 
   if (href) {
     return (
-      <Link href={href} className={styles}>
+      <Link href={href} className={styles} data-testid={props["data-testid"]}>
         {children}
       </Link>
     );
@@ -42,4 +43,3 @@ export function Button({
     </button>
   );
 }
-

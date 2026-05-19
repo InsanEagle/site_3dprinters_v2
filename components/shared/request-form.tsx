@@ -215,7 +215,7 @@ export function RequestForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate className={formClassName}>
+    <form onSubmit={handleSubmit} noValidate data-testid={`request-form-${source}`} className={formClassName}>
       <div className="mb-6">
         <h3 id={titleId} className="text-2xl font-semibold text-ink">
           {title}
@@ -236,6 +236,7 @@ export function RequestForm({
           <input
             required
             name="name"
+            data-testid="request-name"
             value={values.name}
             onChange={handleChange}
             aria-invalid={Boolean(fieldErrors.name)}
@@ -254,6 +255,7 @@ export function RequestForm({
           <input
             required
             name="contact"
+            data-testid="request-contact"
             value={values.contact}
             onChange={handleChange}
             aria-invalid={Boolean(fieldErrors.contact)}
@@ -271,6 +273,7 @@ export function RequestForm({
           Марка автомобиля
           <input
             name="brand"
+            data-testid="request-brand"
             value={values.brand ?? ""}
             onChange={handleChange}
             className="rounded-xl border border-line px-4 py-3 outline-none transition focus:border-accent"
@@ -281,6 +284,7 @@ export function RequestForm({
           Модель автомобиля
           <input
             name="model"
+            data-testid="request-model"
             value={values.model ?? ""}
             onChange={handleChange}
             className="rounded-xl border border-line px-4 py-3 outline-none transition focus:border-accent"
@@ -292,6 +296,7 @@ export function RequestForm({
           <textarea
             required
             name="details"
+            data-testid="request-details"
             rows={compact ? 4 : 5}
             value={values.details}
             onChange={handleChange}
@@ -318,6 +323,7 @@ export function RequestForm({
               ref={fileInputRef}
               type="file"
               name="files"
+              data-testid="request-files"
               accept={REQUEST_UPLOAD_ACCEPT}
               multiple
               onChange={handleFileChange}
@@ -354,7 +360,7 @@ export function RequestForm({
 
       <div className="mt-6 flex flex-col gap-4">
         {status.type === "error" ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+          <div data-testid="request-error" className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
             <p>{status.message}</p>
             {status.code === "submission_unavailable" || status.code === "delivery_failed" || status.code === "server_error" ? (
               <div className="mt-3 flex flex-col gap-3 sm:flex-row">
@@ -370,14 +376,14 @@ export function RequestForm({
         ) : null}
 
         {status.type === "success" ? (
-          <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-700">
+          <div data-testid="request-success" className="rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-700">
             {status.message}
           </div>
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm leading-6 text-body">{footerNote}</p>
-          <Button type="submit" disabled={isSubmitting}>
+          <Button type="submit" disabled={isSubmitting} data-testid="request-submit">
             {isSubmitting ? (files.length ? "Загружаем и отправляем..." : "Отправляем...") : submitLabel}
           </Button>
         </div>

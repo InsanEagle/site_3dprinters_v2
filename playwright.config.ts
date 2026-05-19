@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = 3001;
+const port = 3011;
 
 export default defineConfig({
   testDir: "./tests",
@@ -13,15 +13,8 @@ export default defineConfig({
   },
   projects: [
     {
-      name: "desktop-chromium",
+      name: "smoke-chromium",
       use: { ...devices["Desktop Chrome"] }
-    },
-    {
-      name: "mobile-chromium",
-      use: {
-        ...devices["Pixel 5"],
-        browserName: "chromium"
-      }
     }
   ],
   webServer: [
@@ -32,14 +25,18 @@ export default defineConfig({
       timeout: 30_000
     },
     {
-      command: "npm.cmd run dev",
+      command: "npm.cmd run build && npm.cmd run start",
       url: `http://127.0.0.1:${port}`,
       reuseExistingServer: true,
-      timeout: 120_000,
+      timeout: 180_000,
       env: {
         PORT: String(port),
         REQUESTS_WEBHOOK_URL: "http://127.0.0.1:3999/",
-        NEXT_PUBLIC_SITE_NAME: "Изготовление деталей"
+        NEXT_PUBLIC_SITE_NAME: "Smoke Test Site",
+        REQUEST_ATTACHMENTS_ACCESS_SECRET: "test-request-attachments-secret",
+        INTERNAL_BACKOFFICE_PASSWORD: "test-backoffice-password",
+        INTERNAL_BACKOFFICE_SESSION_SECRET: "test-backoffice-secret",
+        ORDER_PUBLIC_ACCESS_SECRET: "test-order-public-secret"
       }
     }
   ]

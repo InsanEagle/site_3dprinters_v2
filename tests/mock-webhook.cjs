@@ -1,4 +1,15 @@
+const fs = require("fs");
 const http = require("http");
+
+const logPath = process.env.MOCK_WEBHOOK_LOG_PATH;
+
+function writeLog(entry) {
+  if (!logPath) {
+    return;
+  }
+
+  fs.appendFileSync(logPath, `${JSON.stringify(entry)}\n`, "utf8");
+}
 
 const server = http.createServer((req, res) => {
   if (req.url === "/health") {
@@ -13,6 +24,12 @@ const server = http.createServer((req, res) => {
       body += chunk;
     });
     req.on("end", () => {
+      writeLog({
+        method: req.method,
+        url: req.url,
+        headers: req.headers,
+        body: body ? JSON.parse(body) : null
+      });
       res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
       res.end(JSON.stringify({ ok: true, received: Boolean(body) }));
     });

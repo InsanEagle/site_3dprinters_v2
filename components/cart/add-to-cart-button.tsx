@@ -31,6 +31,7 @@ export function AddToCartButton({ slug, className, label = "В корзину" }
   return (
     <div className="flex flex-col items-start gap-2">
       <Button
+        data-testid={`add-to-cart-${slug}`}
         className={className}
         onClick={() => {
           const result = addItem(slug);
@@ -41,7 +42,7 @@ export function AddToCartButton({ slug, className, label = "В корзину" }
         {label}
       </Button>
       {message ? (
-        <p className={`text-sm ${status === "success" ? "text-accent" : "text-body"}`} aria-live="polite">
+        <p data-testid={`add-to-cart-message-${slug}`} className={`text-sm ${status === "success" ? "text-accent" : "text-body"}`} aria-live="polite">
           {message}
         </p>
       ) : null}
