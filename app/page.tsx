@@ -14,6 +14,7 @@ import { HomeActions } from "@/components/page/home-actions";
 export default function HomePage() {
   const publishedTrustItems =
     trustContent.sectionMode === "hide_if_no_real_data" ? [] : [];
+  const catalogPreviewProducts = products.filter((product) => product.images.length > 0 && product.category !== "repair-parts").slice(0, 6);
 
   return (
     <>
@@ -79,7 +80,7 @@ export default function HomePage() {
         <Container>
           <SectionTitle eyebrow="Каталог" title="Примеры типовых позиций" description="Каталог можно использовать как отправную точку для подбора похожих изделий и обращения по своей задаче." />
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {products.slice(0, 6).map((product) => (
+            {catalogPreviewProducts.map((product) => (
               <ProductCard key={product.slug} product={product} />
             ))}
           </div>

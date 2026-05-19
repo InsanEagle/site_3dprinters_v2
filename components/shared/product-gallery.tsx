@@ -1,17 +1,29 @@
+import { ProductImageStage, ProductImageTone, isTransparentProductAsset } from "@/components/shared/product-image-stage";
 import { getProductImages } from "@/lib/catalog";
 
-export function ProductGallery({ images, title }: { images: string[]; title: string }) {
+function inferGalleryTone(images: string[]): ProductImageTone {
+  return images.some((image) => isTransparentProductAsset(image)) ? "dark" : "neutral";
+}
+
+export function ProductGallery({
+  images,
+  title,
+  tone
+}: {
+  images: string[];
+  title: string;
+  tone?: ProductImageTone;
+}) {
   const galleryImages = getProductImages(images);
   const primaryImage = galleryImages[0];
+  const galleryTone = tone ?? inferGalleryTone(galleryImages);
 
   return (
-    <div className="grid gap-4">
+    <div className="grid content-start gap-4 self-start">
       {primaryImage ? (
-        <div className="overflow-hidden rounded-3xl border border-line bg-surface">
-          <img src={primaryImage} alt={title} className="min-h-[360px] w-full object-cover" />
-        </div>
+        <ProductImageStage image={primaryImage} title={title} tone={galleryTone} size="gallery" className="self-start rounded-3xl" />
       ) : (
-        <div className="flex min-h-[360px] flex-col justify-between rounded-3xl border border-line bg-[linear-gradient(135deg,_#f6f7f8_0%,_#eceff3_100%)] p-6">
+        <div className="flex min-h-[380px] flex-col justify-between self-start rounded-3xl border border-line bg-[linear-gradient(135deg,_#f6f7f8_0%,_#eceff3_100%)] p-6">
           <span className="w-fit rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-body">
             Изображения не опубликованы
           </span>
@@ -26,9 +38,14 @@ export function ProductGallery({ images, title }: { images: string[]; title: str
       {galleryImages.length > 1 ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {galleryImages.slice(1).map((image, index) => (
-            <div key={image} className="overflow-hidden rounded-2xl border border-line bg-surface">
-              <img src={image} alt={`${title} — изображение ${index + 2}`} className="h-40 w-full object-cover" loading="lazy" />
-            </div>
+            <ProductImageStage
+              key={image}
+              image={image}
+              title={`${title} — изображение ${index + 2}`}
+              tone={galleryTone}
+              size="thumbnail"
+              className="rounded-2xl"
+            />
           ))}
         </div>
       ) : null}

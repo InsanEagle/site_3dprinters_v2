@@ -82,8 +82,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
   return (
     <div className="py-16 sm:py-20">
       <Container>
-        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
-          <ProductGallery images={product.images} title={product.name} />
+        <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
+          <ProductGallery images={product.images} title={product.name} tone={product.imageTone} />
           <div>
             <p className="text-sm font-medium text-body">{product.categoryLabel}</p>
             <h1 className="mt-3 text-4xl font-semibold tracking-tight text-ink">{product.name}</h1>
@@ -105,7 +105,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
             ) : null}
             {isMarketplaceProduct(product) && hasMarketplaceUrl && marketplaceHref ? (
               <p className="mt-4 text-sm leading-6 text-body">
-                Основной канал покупки для этой позиции вынесен на маркетплейс. На сайте сохраняем карточку товара, описание и переход в актуальный канал.
+                На первом этапе сайт работает как витрина товара и точка входа в обращение. Для этой позиции основной канал покупки вынесен на маркетплейс, а на сайте сохраняем описание и переход в актуальный канал.
               </p>
             ) : null}
             {isDirectSaleProduct(product) ? (
@@ -113,6 +113,11 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                 {canAddToCart
                   ? "Для этой позиции доступна базовая корзина: можно добавить товар, изменить количество и собрать набор перед следующим этапом оформления."
                   : "Для этой позиции корзина пока не используется: если цена или условия требуют уточнения, сайт честно оставляет direct-sale сценарий через запрос."}
+              </p>
+            ) : null}
+            {!isDirectSaleProduct(product) && !isMarketplaceProduct(product) ? (
+              <p className="mt-4 text-sm leading-6 text-body">
+                Для этой позиции первый публичный сценарий остается заявочным: сначала уточняем параметры, совместимость и способ решения, а уже потом подтверждаем дальнейшие шаги.
               </p>
             ) : null}
             <div className="mt-6">

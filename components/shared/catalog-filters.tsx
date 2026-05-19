@@ -28,8 +28,12 @@ export function CatalogFilters({
   const formAction = resultsAnchorId ? `${pathname}#${resultsAnchorId}` : pathname;
 
   return (
-    <div className="mb-12 rounded-3xl border border-line bg-surface p-6">
-      <form action={formAction} className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(220px,0.8fr)_auto_auto] lg:items-end">
+    <div className="mb-12 rounded-3xl border border-line bg-surface p-6" data-testid="catalog-filters">
+      <form
+        action={formAction}
+        data-testid="catalog-filters-form"
+        className="grid gap-4 lg:grid-cols-[minmax(0,1.4fr)_minmax(220px,0.8fr)_auto_auto] lg:items-end"
+      >
         <label className="grid gap-2 text-sm font-medium text-ink">
           Поиск по каталогу
           <input
@@ -37,6 +41,7 @@ export function CatalogFilters({
             name="q"
             defaultValue={query}
             placeholder="Название, категория или slug"
+            data-testid="catalog-search-input"
             className="rounded-xl border border-line bg-white px-4 py-3 text-body"
           />
         </label>
@@ -54,6 +59,7 @@ export function CatalogFilters({
             <select
               name="category"
               defaultValue={selectedCategory ?? ""}
+              data-testid="catalog-category-select"
               className="rounded-xl border border-line bg-white px-4 py-3 text-body"
             >
               <option value="">Все категории</option>
@@ -66,15 +72,15 @@ export function CatalogFilters({
           </label>
         )}
 
-        <Button type="submit" className="w-full lg:w-auto">
+        <Button type="submit" className="w-full lg:w-auto" data-testid="catalog-apply-filters">
           Показать
         </Button>
-        <Button href={resetHref} variant="secondary" className="w-full lg:w-auto">
+        <Button href={resetHref} variant="secondary" className="w-full lg:w-auto" data-testid="catalog-reset-filters">
           Сбросить
         </Button>
       </form>
 
-      <div className="mt-4 flex flex-col gap-2 text-sm text-body sm:flex-row sm:items-center sm:justify-between">
+      <div className="mt-4 flex flex-col gap-2 text-sm text-body sm:flex-row sm:items-center sm:justify-between" data-testid="catalog-filters-summary">
         <p>
           Найдено {resultsCount} из {totalCount} {totalCount === 1 ? "позиции" : "позиций"}.
         </p>

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { AddToCartButton } from "@/components/cart/add-to-cart-button";
-import { Product } from "@/types";
+import { ProductImageStage } from "@/components/shared/product-image-stage";
 import { Button } from "@/components/ui/button";
 import { productContent } from "@/data/content";
 import {
@@ -15,6 +15,41 @@ import {
   getProductScenarioLabel
 } from "@/lib/catalog";
 import { getSafeText } from "@/lib/content";
+import { Product } from "@/types";
+
+function ProductCardMedia({ product, primaryImage }: { product: Product; primaryImage?: string }) {
+  if (primaryImage) {
+    return (
+      <ProductImageStage
+        image={primaryImage}
+        title={product.name}
+        tone={product.imageTone ?? "neutral"}
+        size="card"
+        className="mb-5"
+        testId={`product-card-media-${product.slug}`}
+      />
+    );
+  }
+
+  return (
+    <div
+      data-testid={`product-card-media-${product.slug}`}
+      className="relative mb-5 overflow-hidden rounded-[28px] border border-line/80 bg-[#f7f8fa]"
+    >
+      <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(246,247,248,0.98)_58%,rgba(236,240,244,1)_100%)]" />
+      <div className="absolute inset-x-[8%] inset-y-[10%] rounded-[24px] border border-white/70 bg-[radial-gradient(circle_at_50%_36%,rgba(255,255,255,0.96)_0%,rgba(249,250,251,0.86)_40%,rgba(243,245,247,0.18)_72%,rgba(243,245,247,0)_100%)]" />
+      <div className="relative flex h-64 flex-col justify-between p-5 sm:h-72 sm:p-6">
+        <span className="w-fit rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-body shadow-[0_4px_12px_rgba(31,35,40,0.04)]">
+          Без фото
+        </span>
+        <div className="max-w-[16rem]">
+          <p className="text-sm font-medium text-body">{product.categoryLabel}</p>
+          <p className="mt-2 text-lg font-semibold leading-7 text-ink">{product.name}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function ProductCard({ product }: { product: Product }) {
   const summary = getSafeText(product.shortDescription) ?? getSafeText(product.compatibility) ?? productContent.compatibilityFallback;
@@ -30,22 +65,11 @@ export function ProductCard({ product }: { product: Product }) {
   const cartStatusMessage = getProductCartStatusMessage(product);
 
   return (
-    <article className="flex h-full flex-col rounded-3xl border border-line bg-white p-5">
-      {primaryImage ? (
-        <div className="mb-5 overflow-hidden rounded-2xl border border-line bg-surface">
-          <img src={primaryImage} alt={product.name} className="h-56 w-full object-cover" loading="lazy" />
-        </div>
-      ) : (
-        <div className="mb-5 flex h-56 flex-col justify-between rounded-2xl border border-line bg-[linear-gradient(135deg,_#f6f7f8_0%,_#eceff3_100%)] p-4">
-          <span className="w-fit rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-body">
-            Без фото
-          </span>
-          <div>
-            <p className="text-sm font-medium text-body">{product.categoryLabel}</p>
-            <p className="mt-2 max-w-52 text-base font-semibold text-ink">{product.name}</p>
-          </div>
-        </div>
-      )}
+    <article
+      data-testid={`product-card-${product.slug}`}
+      className="group flex h-full flex-col rounded-3xl border border-line bg-white p-5 transition hover:-translate-y-0.5 hover:border-accent/45 hover:shadow-card"
+    >
+      <ProductCardMedia product={product} primaryImage={primaryImage} />
       <p className="text-sm text-body">{product.categoryLabel}</p>
       <h3 className="mt-2 text-xl font-semibold text-ink">{product.name}</h3>
       <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.08em]">
