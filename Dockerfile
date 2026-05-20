@@ -23,7 +23,7 @@ ENV HOSTNAME=0.0.0.0
 
 RUN addgroup --system --gid 1001 nodejs \
   && adduser --system --uid 1001 nextjs \
-  && mkdir -p /app/data/orders /app/data/request-attachments \
+  && mkdir -p /app/data/orders /app/data/requests /app/data/request-attachments \
   && chown -R nextjs:nodejs /app
 
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public

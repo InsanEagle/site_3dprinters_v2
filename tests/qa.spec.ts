@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { e2eOrdersDir, e2eRequestAttachmentsDir, mockWebhookLogPath } from "./e2e-storage";
+import { e2eOrdersDir, e2eRequestsDir, e2eRequestAttachmentsDir, mockWebhookLogPath } from "./e2e-storage";
 
 const sampleImagePath = path.join(process.cwd(), "tests", "fixtures", "sample-image.png");
 const ordersDirPath = e2eOrdersDir;
@@ -109,6 +109,24 @@ async function getLatestRequestAttachmentFile(root = e2eRequestAttachmentsDir): 
   return stats.sort((left, right) => right.modifiedAt - left.modifiedAt)[0]?.filePath;
 }
 
+async function getLatestRequestRecordFile(): Promise<string | undefined> {
+  const entries = await readdir(e2eRequestsDir, { withFileTypes: true }).catch(() => []);
+  const files = entries.filter((entry) => entry.isFile() && entry.name.endsWith(".json")).map((entry) => path.join(e2eRequestsDir, entry.name));
+
+  if (!files.length) {
+    return undefined;
+  }
+
+  const stats = await Promise.all(
+    files.map(async (filePath) => ({
+      filePath,
+      modifiedAt: (await stat(filePath)).mtimeMs
+    }))
+  );
+
+  return stats.sort((left, right) => right.modifiedAt - left.modifiedAt)[0]?.filePath;
+}
+
 async function readLatestWebhookEvent() {
   const log = await readFile(mockWebhookLogPath, "utf8").catch(() => "");
   const lines = log.trim().split("\n").filter(Boolean);
@@ -154,6 +172,7 @@ test("smoke: catalog filtering opens the current product page", async ({ page })
 
 test("smoke: request form submits successfully with an image", async ({ page }) => {
   let createdAttachmentFile: string | undefined;
+  let createdRequestRecordFile: string | undefined;
   const fileCountBefore = await countRequestAttachmentFiles();
 
   try {
@@ -170,6 +189,13 @@ test("smoke: request form submits successfully with an image", async ({ page }) 
     await expect.poll(async () => countRequestAttachmentFiles()).toBeGreaterThan(fileCountBefore);
     createdAttachmentFile = await getLatestRequestAttachmentFile();
     expect(createdAttachmentFile).toBeTruthy();
+    await expect.poll(async () => (await getLatestRequestRecordFile()) ?? "").toContain(".json");
+    createdRequestRecordFile = await getLatestRequestRecordFile();
+    expect(createdRequestRecordFile).toBeTruthy();
+
+    if (!createdRequestRecordFile) {
+      throw new Error("Request record was not created.");
+    }
 
     await expect
       .poll(async () => {
@@ -187,14 +213,30 @@ test("smoke: request form submits successfully with an image", async ({ page }) 
     const webhookEvent = await readLatestWebhookEvent();
     const attachmentUrl = webhookEvent.body.payload.attachments[0].url;
     const attachmentRelativeUrl = webhookEvent.body.payload.attachments[0].relativeUrl;
+    const requestRecord = JSON.parse(await readFile(createdRequestRecordFile, "utf8")) as { id: string };
 
     expect(attachmentUrl).not.toContain("0.0.0.0");
     expect(attachmentUrl).not.toContain("localhost");
     expect(attachmentUrl).not.toContain("127.0.0.1");
     expect(attachmentRelativeUrl).not.toContain("0.0.0.0");
+
+    await page.goto("/internal/login");
+    await page.getByTestId("internal-login-password").fill(internalPassword);
+    await page.getByTestId("internal-login-submit").click();
+    await expect(page).toHaveURL(/\/internal\/orders/);
+
+    await page.goto("/internal/requests");
+    await expect(page.getByTestId("internal-requests-page")).toBeVisible();
+    await page.getByTestId(`internal-request-row-${requestRecord.id}`).click();
+    await expect(page).toHaveURL(new RegExp(`/internal/requests/${requestRecord.id}$`));
+    await expect(page.getByTestId("internal-request-details")).toBeVisible();
   } finally {
     if (createdAttachmentFile) {
       await rm(createdAttachmentFile, { force: true });
+    }
+
+    if (createdRequestRecordFile) {
+      await rm(createdRequestRecordFile, { force: true });
     }
   }
 });

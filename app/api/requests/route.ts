@@ -1,6 +1,7 @@
 ﻿import { NextResponse } from "next/server";
 import { removeSavedRequestAttachments, saveRequestAttachments } from "@/lib/request-attachments";
 import {
+  RequestSubmissionPayload,
   RequestSubmissionResponse,
   getRequestSubmissionAvailability,
   requestValidationMessages,
@@ -8,6 +9,7 @@ import {
   validateRequestFiles,
   validateRequestSubmission
 } from "@/lib/request-submission";
+import { createRequestRecord, saveRequestRecord } from "@/lib/requests-store";
 
 function getStringValue(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -18,6 +20,43 @@ function getFiles(formData: FormData, key: string) {
   return formData
     .getAll(key)
     .filter((value): value is File => value instanceof File && value.size > 0);
+}
+
+function toPublicRequestSubmissionResponse(result: RequestSubmissionResponse): RequestSubmissionResponse {
+  if (!result.ok) {
+    return result;
+  }
+
+  return {
+    ok: true,
+    message: result.message,
+    redirectTo: result.redirectTo
+  };
+}
+
+async function saveDeliveredRequestRecord(input: {
+  requestId?: string;
+  createdAt?: string;
+  payload: RequestSubmissionPayload;
+  channels?: Awaited<ReturnType<typeof submitRequestSubmission>>["channels"];
+}) {
+  if (!input.requestId || !input.createdAt) {
+    return;
+  }
+
+  const record = createRequestRecord({
+    requestId: input.requestId,
+    createdAt: input.createdAt,
+    payload: input.payload,
+    deliveryStatus: "delivered",
+    channels: input.channels
+  });
+
+  try {
+    await saveRequestRecord(record);
+  } catch {
+    console.warn("[api/requests] Request was delivered, but internal request inbox record could not be saved.");
+  }
 }
 
 export async function POST(request: Request) {
@@ -119,10 +158,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await submitRequestSubmission({
+    const requestPayload = {
       ...validation.data,
       attachments: savedAttachments.length ? savedAttachments : undefined
-    });
+    };
+    const result = await submitRequestSubmission(requestPayload);
 
     if (!result.ok) {
       await removeSavedRequestAttachments(savedAttachments);
@@ -139,7 +179,14 @@ export async function POST(request: Request) {
       return NextResponse.json<RequestSubmissionResponse>(result, { status });
     }
 
-    return NextResponse.json<RequestSubmissionResponse>(result, { status: 201 });
+    await saveDeliveredRequestRecord({
+      requestId: result.requestId,
+      createdAt: result.createdAt,
+      payload: requestPayload,
+      channels: result.channels
+    });
+
+    return NextResponse.json<RequestSubmissionResponse>(toPublicRequestSubmissionResponse(result), { status: 201 });
   } catch {
     await removeSavedRequestAttachments(savedAttachments);
 

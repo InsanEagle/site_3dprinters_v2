@@ -21,6 +21,7 @@
 - корзина и короткий checkout без онлайн-оплаты
 - серверный endpoint для заказов: `POST /api/orders`
 - внутренний backoffice заказов
+- внутренний inbox заявок
 - публичная защищенная страница статуса заказа
 - Playwright smoke-suite для ключевых сценариев
 
@@ -34,6 +35,7 @@
 - `data/site.ts` — каталог, категории, товарные данные
 - `data/content.ts` — централизованный контент
 - `lib/request-submission.ts` — контракт и валидация заявки
+- `lib/requests-store.ts` — файловое хранение заявок
 - `lib/order-submission.ts` — контракт и валидация заказа
 - `lib/orders-store.ts` — файловое хранение заказов
 - `tests/qa.spec.ts` — текущий smoke-suite
@@ -55,6 +57,7 @@ OPERATIONS_EMAIL_WEBHOOK_TOKEN=
 OPERATIONS_SHEETS_WEBHOOK_URL=
 OPERATIONS_SHEETS_WEBHOOK_TOKEN=
 ORDERS_DATA_DIR=
+REQUESTS_DATA_DIR=
 REQUEST_ATTACHMENTS_DIR=
 REQUEST_ATTACHMENTS_ACCESS_SECRET=
 INTERNAL_BACKOFFICE_PASSWORD=
@@ -73,6 +76,7 @@ ORDER_PUBLIC_ACCESS_SECRET=
 - `OPERATIONS_EMAIL_WEBHOOK_URL` / `OPERATIONS_EMAIL_WEBHOOK_TOKEN` — опциональный канал для email-уведомления через webhook-адаптер.
 - `OPERATIONS_SHEETS_WEBHOOK_URL` / `OPERATIONS_SHEETS_WEBHOOK_TOKEN` — опциональный канал для записи в Google Sheets или аналогичную таблицу через webhook-адаптер.
 - `ORDERS_DATA_DIR` — опциональный override директории заказов; по умолчанию `data/orders`.
+- `REQUESTS_DATA_DIR` — опциональный override директории заявок; по умолчанию `data/requests`.
 - `REQUEST_ATTACHMENTS_DIR` — опциональный override директории вложений заявок; по умолчанию `data/request-attachments`.
 - `REQUEST_ATTACHMENTS_ACCESS_SECRET` — секрет для подписанных ссылок на приватные вложения заявок.
 - `INTERNAL_BACKOFFICE_PASSWORD` — пароль для внутреннего backoffice.
@@ -150,6 +154,7 @@ Flow:
 3. Сервер повторно валидирует данные и файлы.
 4. Если все корректно, данные отправляются через webhook.
 5. Только при успешном ответе сервера происходит переход на `/thanks`.
+6. После успешной доставки primary webhook заявка сохраняется во внутренний inbox `data/requests/*.json`.
 
 Production-behavior:
 
@@ -195,10 +200,12 @@ Flow:
 
 ## Внутренний backoffice
 
-Минимальный internal-only интерфейс доступен по `/internal/orders`.
+Минимальный internal-only интерфейс доступен по `/internal/orders` и `/internal/requests`.
 
 Что умеет:
 
+- список заявок из форм сайта
+- просмотр деталей заявки и приватных signed-вложений
 - список заказов
 - фильтр по статусам
 - просмотр состава заказа и customer data
@@ -322,7 +329,7 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
 
 - `tests/qa.spec.ts` — компактный smoke-suite под текущий MVP;
 - покрывает главную, каталог, товар, корзину, checkout, форму заявки, internal login и public order status.
-- Playwright использует изолированные runtime-директории `tmp/e2e/orders` и `tmp/e2e/request-attachments`, чтобы не смешивать smoke-данные с локальными заказами и вложениями.
+- Playwright использует изолированные runtime-директории `tmp/e2e/orders`, `tmp/e2e/requests` и `tmp/e2e/request-attachments`, чтобы не смешивать smoke-данные с локальными заказами, заявками и вложениями.
 
 Примечание по lint:
 
@@ -360,7 +367,7 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
 
 ```bash
 docker build -t autodetail-fdm-mvp .
-docker run --rm -p 3000:3000 --env-file .env.production -v ./data/orders:/app/data/orders -v ./data/request-attachments:/app/data/request-attachments autodetail-fdm-mvp
+docker run --rm -p 3000:3000 --env-file .env.production -v ./data/orders:/app/data/orders -v ./data/requests:/app/data/requests -v ./data/request-attachments:/app/data/request-attachments autodetail-fdm-mvp
 ```
 
 ### Запуск через docker compose
@@ -369,7 +376,7 @@ docker run --rm -p 3000:3000 --env-file .env.production -v ./data/orders:/app/da
 2. Убедитесь, что runtime-директории существуют:
 
 ```bash
-mkdir -p data/orders data/request-attachments
+mkdir -p data/orders data/requests data/request-attachments
 ```
 
 3. Запустите:
@@ -405,9 +412,10 @@ docker compose ps
 
 ### Volumes
 
-`docker-compose.yml` монтирует два runtime-хранилища:
+`docker-compose.yml` монтирует три runtime-хранилища:
 
 - `./data/orders:/app/data/orders`
+- `./data/requests:/app/data/requests`
 - `./data/request-attachments:/app/data/request-attachments`
 
 Эти директории содержат рабочие данные MVP и должны переживать пересборку контейнера.
@@ -415,8 +423,8 @@ docker compose ps
 На Linux/VPS убедитесь, что пользователь контейнера может писать в эти директории. Если нужны права вручную, выполните на сервере:
 
 ```bash
-mkdir -p data/orders data/request-attachments
-sudo chown -R 1001:1001 data/orders data/request-attachments
+mkdir -p data/orders data/requests data/request-attachments
+sudo chown -R 1001:1001 data/orders data/requests data/request-attachments
 ```
 
 ### Backup / restore
@@ -425,7 +433,7 @@ sudo chown -R 1001:1001 data/orders data/request-attachments
 
 ```bash
 mkdir -p backups
-tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/request-attachments
+tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
 ```
 
 Restore:
@@ -436,7 +444,7 @@ tar -xzf backups/site-data-YYYYMMDD-HHMMSS.tar.gz
 docker compose up -d
 ```
 
-После restore проверьте `/internal/orders` и отправку тестовой заявки.
+После restore проверьте `/internal/orders`, `/internal/requests` и отправку тестовой заявки.
 
 ## Что сейчас не реализовано
 

@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { e2eOrdersDir, e2eRequestAttachmentsDir, mockWebhookLogPath } from "./tests/e2e-storage";
+import { e2eOrdersDir, e2eRequestsDir, e2eRequestAttachmentsDir, mockWebhookLogPath } from "./tests/e2e-storage";
 
 const port = 3011;
 
@@ -43,6 +43,7 @@ export default defineConfig({
         NEXT_PUBLIC_SITE_NAME: "Smoke Test Site",
         REQUEST_ATTACHMENTS_ACCESS_SECRET: "test-request-attachments-secret",
         ORDERS_DATA_DIR: e2eOrdersDir,
+        REQUESTS_DATA_DIR: e2eRequestsDir,
         REQUEST_ATTACHMENTS_DIR: e2eRequestAttachmentsDir,
         INTERNAL_BACKOFFICE_PASSWORD: "test-backoffice-password",
         INTERNAL_BACKOFFICE_SESSION_SECRET: "test-backoffice-secret",

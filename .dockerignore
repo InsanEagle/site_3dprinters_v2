@@ -19,6 +19,8 @@ dist
 
 data/orders/*
 !data/orders/.gitkeep
+data/requests/*
+!data/requests/.gitkeep
 data/request-attachments/*
 !data/request-attachments/.gitkeep
 public/uploads/requests

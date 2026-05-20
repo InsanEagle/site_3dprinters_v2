@@ -23,14 +23,17 @@ export default async function InternalProtectedLayout({ children }: { children: 
       <div className="flex flex-col gap-4 rounded-[32px] border border-line bg-white p-6 shadow-card sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-accent">Internal only</p>
-          <h1 className="mt-2 text-2xl font-semibold text-ink">Заказы</h1>
+          <h1 className="mt-2 text-2xl font-semibold text-ink">Backoffice</h1>
           <p className="mt-2 text-sm leading-6 text-body">
-            Backoffice работает поверх текущего order-layer и того же файлового хранилища.
+            Минимальная внутренняя панель поверх файлового хранилища заявок и заказов.
           </p>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button href="/internal/orders" variant="secondary">
-            Список заказов
+            Заказы
+          </Button>
+          <Button href="/internal/requests" variant="secondary">
+            Заявки
           </Button>
           <form action={logoutFromInternalBackoffice}>
             <Button type="submit" variant="ghost" data-testid="internal-logout-submit">

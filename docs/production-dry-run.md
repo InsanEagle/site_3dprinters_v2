@@ -8,6 +8,7 @@ The project uses:
 - No database.
 - File-based runtime storage:
   - `data/orders`
+  - `data/requests`
   - `data/request-attachments`
 - External webhook receiver for request/order delivery.
 - Reverse proxy and HTTPS as an external infrastructure layer.
@@ -118,6 +119,7 @@ Storage overrides normally stay empty in production:
 
 ```env
 ORDERS_DATA_DIR=
+REQUESTS_DATA_DIR=
 REQUEST_ATTACHMENTS_DIR=
 ```
 
@@ -128,30 +130,32 @@ Use them only for custom deployments or tests. The Docker compose setup already 
 Runtime directories:
 
 - `data/orders`
+- `data/requests`
 - `data/request-attachments`
 
 Create them:
 
 ```bash
-mkdir -p data/orders data/request-attachments
+mkdir -p data/orders data/requests data/request-attachments
 ```
 
 The Docker image runs as non-root user `1001`. On Linux/VPS, make mounted directories writable:
 
 ```bash
-sudo chown -R 1001:1001 data/orders data/request-attachments
+sudo chown -R 1001:1001 data/orders data/requests data/request-attachments
 ```
 
 Check permissions:
 
 ```bash
-ls -ld data/orders data/request-attachments
+ls -ld data/orders data/requests data/request-attachments
 ```
 
 After the app starts, verify writes by submitting a test request/order and checking:
 
 ```bash
 find data/orders -maxdepth 1 -type f -name '*.json' | tail
+find data/requests -maxdepth 1 -type f -name '*.json' | tail
 find data/request-attachments -type f | tail
 ```
 
@@ -218,9 +222,11 @@ Scenario:
 4. Submit.
 5. Confirm user reaches `/thanks`.
 6. Confirm webhook receiver got `request.created`.
-7. Confirm attachment file is stored under `data/request-attachments`.
-8. Confirm no new file appears under `public/uploads/requests`.
-9. Confirm signed attachment URL from webhook works only with valid access token or internal session.
+7. Confirm request JSON is created under `data/requests`.
+8. Confirm attachment file is stored under `data/request-attachments`.
+9. Confirm no new file appears under `public/uploads/requests`.
+10. Confirm signed attachment URL from webhook works only with valid access token or internal session.
+11. Open `/internal/requests` and check the saved request.
 
 Failure checks:
 
@@ -251,7 +257,7 @@ Create backup:
 
 ```bash
 mkdir -p backups
-tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/request-attachments
+tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
 ```
 
 Restore:
@@ -259,7 +265,7 @@ Restore:
 ```bash
 docker compose stop app
 tar -xzf backups/site-data-YYYYMMDD-HHMMSS.tar.gz
-sudo chown -R 1001:1001 data/orders data/request-attachments
+sudo chown -R 1001:1001 data/orders data/requests data/request-attachments
 docker compose up -d
 ```
 
@@ -273,6 +279,7 @@ docker compose logs --tail=100 app
 Then verify:
 
 - `/internal/orders`
+- `/internal/requests`
 - one existing order
 - one public order status link
 - one test request submission
@@ -304,7 +311,7 @@ Before rollback, backup runtime data:
 
 ```bash
 mkdir -p backups
-tar -czf backups/site-data-before-rollback-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/request-attachments
+tar -czf backups/site-data-before-rollback-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
 ```
 
 Rollback code:
@@ -317,7 +324,7 @@ docker compose --env-file .env.production up -d
 docker compose ps
 ```
 
-Do not delete mounted volumes during rollback. `data/orders` and `data/request-attachments` are the current MVP persistence layer.
+Do not delete mounted volumes during rollback. `data/orders`, `data/requests`, and `data/request-attachments` are the current MVP persistence layer.
 
 ## 12. Pre-Launch Checklist
 
@@ -338,6 +345,7 @@ Do not delete mounted volumes during rollback. `data/orders` and `data/request-a
 - [ ] Restore process is tested at least once on staging/test VPS.
 - [ ] `/internal/login` works with production credentials.
 - [ ] `/internal/orders` shows saved orders.
+- [ ] `/internal/requests` shows saved requests.
 - [ ] Public order status link works.
 - [ ] Request attachment signed link works.
 - [ ] `/robots.txt` checked.
