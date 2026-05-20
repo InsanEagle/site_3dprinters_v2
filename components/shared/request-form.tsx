@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { ChangeEvent, FormEvent, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { getDefaultRequestFormText } from "@/lib/request-ui";
@@ -382,7 +383,16 @@ export function RequestForm({
         ) : null}
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm leading-6 text-body">{footerNote}</p>
+          <div className="space-y-2 text-sm leading-6 text-body">
+            <p>{footerNote}</p>
+            <p>
+              Нажимая кнопку, вы соглашаетесь с{" "}
+              <Link href="/policy" className="font-medium text-accent transition hover:text-accent-hover">
+                политикой обработки персональных данных
+              </Link>
+              .
+            </p>
+          </div>
           <Button type="submit" disabled={isSubmitting} data-testid="request-submit">
             {isSubmitting ? (files.length ? "Загружаем и отправляем..." : "Отправляем...") : submitLabel}
           </Button>

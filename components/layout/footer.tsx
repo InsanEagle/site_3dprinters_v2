@@ -11,7 +11,8 @@ const footerLinks = [
   { href: "/about", label: "О направлении" },
   { href: "/delivery", label: "Передача изделий" },
   { href: "/faq", label: "FAQ" },
-  { href: "/contacts", label: "Контакты" }
+  { href: "/contacts", label: "Контакты" },
+  { href: "/policy", label: "Политика обработки данных" }
 ];
 
 export function Footer() {

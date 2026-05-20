@@ -9,7 +9,8 @@ const staticRoutes = [
   { path: "/delivery", priority: 0.65 },
   { path: "/faq", priority: 0.6 },
   { path: "/contacts", priority: 0.75 },
-  { path: "/about", priority: 0.5 }
+  { path: "/about", priority: 0.5 },
+  { path: "/policy", priority: 0.35 }
 ] as const;
 
 function getSiteUrl() {
