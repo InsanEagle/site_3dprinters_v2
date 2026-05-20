@@ -354,6 +354,8 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
 
 Минимальный production-контур использует standalone build Next.js без отдельной БД, nginx или HTTPS-слоя внутри приложения.
 
+Подробный production dry run перед реальным VPS-запуском описан в [docs/production-dry-run.md](docs/production-dry-run.md).
+
 ### Локальная проверка образа
 
 ```bash
