@@ -1,8 +1,10 @@
 import { Metadata } from "next";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Container } from "@/components/shared/container";
 import { FAQAccordion } from "@/components/shared/faq-accordion";
 import { SectionTitle } from "@/components/shared/section-title";
 import { faqContent } from "@/data/content";
+import { createFaqPageJsonLd } from "@/lib/seo-jsonld";
 
 export const metadata: Metadata = {
   title: "FAQ | Изготовление деталей",
@@ -12,6 +14,7 @@ export const metadata: Metadata = {
 export default function FaqPage() {
   return (
     <div className="bg-surface py-16 sm:py-20">
+      <JsonLd data={createFaqPageJsonLd()} />
       <Container>
         <SectionTitle
           eyebrow="FAQ"

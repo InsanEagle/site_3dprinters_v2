@@ -1,5 +1,6 @@
 ﻿import { Metadata } from "next";
 import { ServiceHeroActions } from "@/components/page/service-hero-actions";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
 import { CTASection } from "@/components/shared/cta-section";
@@ -10,6 +11,7 @@ import { SectionTitle } from "@/components/shared/section-title";
 import { Timeline } from "@/components/shared/timeline";
 import { homeContent, servicesContent } from "@/data/content";
 import { getCustomFormText, getCustomPhotoRequestFormText } from "@/lib/request-ui";
+import { createServiceJsonLd } from "@/lib/seo-jsonld";
 
 const service = servicesContent.find((item) => item.slug === "custom")!;
 const customFormCopy = getCustomFormText();
@@ -21,8 +23,11 @@ export const metadata: Metadata = {
 };
 
 export default function CustomPage() {
+  const serviceJsonLd = createServiceJsonLd("custom");
+
   return (
     <>
+      {serviceJsonLd ? <JsonLd data={serviceJsonLd} /> : null}
       <HeroSection
         title={service.bodyTitle}
         description={service.bodyText}

@@ -1,6 +1,7 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductActions } from "@/components/page/product-actions";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Container } from "@/components/shared/container";
 import { ProductCard } from "@/components/shared/product-card";
 import { ProductGallery } from "@/components/shared/product-gallery";
@@ -24,6 +25,7 @@ import {
 } from "@/lib/catalog";
 import { getSafeText } from "@/lib/content";
 import { getProductDeliverySummary } from "@/lib/delivery";
+import { createProductJsonLd } from "@/lib/seo-jsonld";
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -81,6 +83,7 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
   return (
     <div className="py-16 sm:py-20">
+      <JsonLd data={createProductJsonLd(product)} />
       <Container>
         <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] lg:items-start">
           <ProductGallery images={product.images} title={product.name} tone={product.imageTone} />
