@@ -10,7 +10,7 @@ The business goal is not to immediately replace Ozon and other marketplaces. The
 - The website becomes an SEO channel, catalog, showcase, request channel, and partial direct-order layer.
 - The strongest focus is on services: custom manufacturing, 3D scanning, rare-part selection, and making parts from a sample/photo/model.
 
-Current audit classification: the project is closer to a working MVP with P0 blockers than to a raw prototype.
+Current audit classification: the project is a working production-like MVP with remaining operational launch tasks.
 
 Readiness estimates from the latest audit:
 
@@ -36,11 +36,21 @@ Readiness estimates from the latest audit:
 - Internal order backoffice exists under `/internal/*`.
 - SEO routes now include `/sitemap.xml` and `/robots.txt`.
 
-Needs verification:
+Verified after the latest VPS dry run:
 
-- Final VPS/self-host production deployment shape now has a minimal Docker contour and production dry run checklist, but needs a real VPS dry run.
-- Long-term persistence strategy for orders and request attachments.
-- Exact production webhook receiver implementation.
+- Docker production build works on a Cloud.ru VPS.
+- The container starts.
+- HTTPS works through Caddy.
+- Next.js is reachable locally through `127.0.0.1:3000`.
+- Public pages, internal backoffice, request inbox, request flow, signed attachments, backup creation, sitemap, and robots were checked.
+
+Needs verification before real production:
+
+- Real domain instead of temporary `sslip.io`.
+- Real webhook receiver instead of test receiver.
+- Regular backup schedule and restore rehearsal.
+- Firewall hardening for port `3000` and SSH.
+- Personal data processing policy.
 
 ## 3. Implemented features
 
@@ -57,6 +67,7 @@ Needs verification:
 - Cart and short checkout without online payment.
 - Order API and file-based order records.
 - Internal order backoffice with login, order list, statuses, delivery status, retry, and public status links.
+- Internal request inbox with request list and request detail pages.
 - Signed access for request attachments.
 - Sitemap.
 - Robots.
@@ -83,18 +94,17 @@ Current status:
 
 Remaining P0:
 
-- Real VPS dry run with production env, volumes, backup, restore, and webhook receiver still needs to be executed manually.
-- Production deployment ownership/permissions verification for the current file-based storage model.
+- No known code-level P0 blockers after the VPS/HTTPS dry run.
+- Next P0 before real launch is operational: real domain, real webhook receiver, recurring backup, firewall hardening, SSH restriction, and privacy/legal readiness.
 
 ## 5. Known P1 issues
 
-- Add truthful Schema.org where useful.
-- E2E isolation is implemented with `ORDERS_DATA_DIR`, `REQUEST_ATTACHMENTS_DIR`, and `tmp/e2e/*` test storage.
+- Truthful Schema.org has been added for Organization, Product, FAQPage, and Service where data is real.
+- E2E isolation is implemented with `ORDERS_DATA_DIR`, `REQUESTS_DATA_DIR`, `REQUEST_ATTACHMENTS_DIR`, and `tmp/e2e/*` test storage.
 - Clarify checkout as inquiry-first unless real direct-sale SKU data is ready.
 - Add or verify real Ozon URLs if marketplace handoff CTAs are used.
-- Review env/backoffice production setup and operational checklist.
-- Decide whether requests need a local backoffice/inbox instead of webhook-only handling.
-- Keep addressing existing lint warnings about `<img>` vs `next/image` when image handling is ready.
+- Review env/backoffice setup after switching from dry run to real domain and real receiver.
+- Keep the request inbox minimal until real production usage shows what workflow is actually needed.
 
 ## 6. Known P2 issues
 
@@ -117,6 +127,8 @@ Remaining P0:
 - Keep `/internal/*`, `/api/*`, and `/orders/*` out of public SEO surfaces.
 - Use `NEXT_PUBLIC_SITE_URL` / `APP_URL` for absolute sitemap and operational URLs.
 - Keep Schema.org truthful only: no fake ratings, prices, reviews, or testimonials.
+- Keep Next.js bound to `127.0.0.1:3000` behind Caddy/nginx/Traefik for HTTPS deployments.
+- Store requests in `data/requests` and attachments in `data/request-attachments`; do not put uploaded files in `public`.
 
 ## 8. Things explicitly postponed
 
@@ -132,13 +144,15 @@ Remaining P0:
 
 ## 9. Current recommended roadmap
 
-1. Execute `docs/production-dry-run.md` on a real VPS/container environment with production env, mounted volumes, backup, restore, and webhook receiver.
-2. Add truthful Schema.org for Organization, Product where data is real, and FAQ if appropriate.
-3. Review checkout/product CTAs so the public flow stays inquiry-first unless direct-sale data is real.
-4. Add or verify real Ozon URLs before using marketplace handoff as a serious user path.
-5. Review request handling after first production-like test: decide whether webhook-only is enough or a local request inbox is needed.
-6. Polish imported product descriptions and category grouping.
-7. Finalize production runbook details for reverse proxy, HTTPS, monitoring, and server backup schedule.
+1. Replace temporary `sslip.io` access with a real domain.
+2. Replace `webhook.site` with a real webhook receiver.
+3. Configure recurring backup for `data/orders`, `data/requests`, and `data/request-attachments`.
+4. Close external port `3000` and restrict SSH to the operator IP where possible.
+5. Prepare personal data processing policy before public launch.
+6. Connect analytics.
+7. Review checkout/product CTAs so the public flow stays inquiry-first unless direct-sale data is real.
+8. Add or verify real Ozon URLs before using marketplace handoff as a serious user path.
+9. Polish imported product descriptions and category grouping.
 
 ## 10. Last audit summary
 
@@ -149,10 +163,11 @@ The latest audit found a substantial MVP foundation:
 - The largest launch risks were operational and SEO-readiness gaps rather than lack of core pages.
 - Header responsiveness, lint, sitemap, robots, and production request behavior were identified as P0 items.
 - Several P0 items have since been addressed in follow-up tasks.
-- Minimal Docker/VPS readiness and a production dry run checklist have been added, but a real VPS dry run remains required before launch.
+- Minimal Docker/VPS readiness and a production dry run checklist have been added.
+- A Cloud.ru VPS / HTTPS dry run has been completed successfully; details are recorded in `docs/vps-dry-run-result.md`.
 
 Residual risk:
 
-- The project is still not fully production-ready until deployment, storage, backup, and env/runbook details are settled.
+- The project is still not fully production-ready until real domain, real webhook receiver, recurring backup, firewall hardening, SSH restriction, and privacy/legal readiness are settled.
 - Checkout/direct-sale behavior remains secondary to inquiry-first positioning.
 - Product/import quality and Schema.org still need careful review before real SEO launch.
