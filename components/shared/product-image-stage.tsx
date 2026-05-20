@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export type ProductImageTone = "neutral" | "dark";
@@ -92,10 +93,12 @@ export function ProductImageStage({
       <div className={cn("absolute rounded-full blur-2xl", scale.glow, palette.glow)} />
       <div className="absolute inset-x-[12%] bottom-4 h-px bg-white/70" />
       <div className={cn("relative flex items-center justify-center", scale.frame)}>
-        <img
+        <Image
           src={image}
           alt={title}
-          loading={priority ? "eager" : "lazy"}
+          width={900}
+          height={700}
+          priority={priority}
           className={cn(
             "w-full transition duration-300 group-hover:scale-[1.02]",
             scale.image,
