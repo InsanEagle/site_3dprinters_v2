@@ -11,6 +11,9 @@ import {
 } from "@/lib/request-submission";
 import { createRequestRecord, saveRequestRecord } from "@/lib/requests-store";
 
+type SuccessfulRequestSubmissionResponse = Extract<Awaited<ReturnType<typeof submitRequestSubmission>>, { ok: true }>;
+type RequestDeliveryChannels = SuccessfulRequestSubmissionResponse["channels"];
+
 function getStringValue(formData: FormData, key: string) {
   const value = formData.get(key);
   return typeof value === "string" ? value : "";
@@ -38,7 +41,7 @@ async function saveDeliveredRequestRecord(input: {
   requestId?: string;
   createdAt?: string;
   payload: RequestSubmissionPayload;
-  channels?: Awaited<ReturnType<typeof submitRequestSubmission>>["channels"];
+  channels?: RequestDeliveryChannels;
 }) {
   if (!input.requestId || !input.createdAt) {
     return;

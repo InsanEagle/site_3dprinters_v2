@@ -1,5 +1,5 @@
 import path from "path";
-import { deliverOperationsEvent, getOperationsNotificationConfig } from "@/lib/operations-notifications";
+import { deliverOperationsEvent, getOperationsNotificationConfig, OperationsChannelResult } from "@/lib/operations-notifications";
 
 export const REQUEST_FIELD_NAMES = ["name", "contact", "details", "file"] as const;
 export const REQUEST_UPLOAD_MAX_FILES = 5;
@@ -49,6 +49,12 @@ export type RequestSubmissionResponse =
       message: string;
       fieldErrors?: RequestFieldErrors;
     };
+
+export type RequestSubmissionDeliveryResponse = RequestSubmissionResponse & {
+  requestId?: string;
+  createdAt?: string;
+  channels?: OperationsChannelResult[];
+};
 
 export type RequestWebhookEvent = {
   event: "request.created";
@@ -257,7 +263,7 @@ function buildWebhookEvent(payload: RequestSubmissionPayload, siteName: string):
 async function deliverRequestViaWebhook(
   event: RequestWebhookEvent,
   config: ReturnType<typeof getRequestSubmissionAvailability>
-): Promise<RequestSubmissionResponse> {
+): Promise<RequestSubmissionDeliveryResponse> {
   if (!config.isConfigured) {
     return {
       ok: false,
@@ -272,7 +278,10 @@ async function deliverRequestViaWebhook(
     return {
       ok: true as const,
       message: requestValidationMessages.success,
-      redirectTo: `/thanks?source=${encodeURIComponent(event.payload.source)}`
+      redirectTo: `/thanks?source=${encodeURIComponent(event.payload.source)}`,
+      requestId: event.requestId,
+      createdAt: event.createdAt,
+      channels: response.channels
     };
   }
 
@@ -283,7 +292,7 @@ async function deliverRequestViaWebhook(
   };
 }
 
-export async function submitRequestSubmission(payload: RequestSubmissionPayload): Promise<RequestSubmissionResponse> {
+export async function submitRequestSubmission(payload: RequestSubmissionPayload): Promise<RequestSubmissionDeliveryResponse> {
   const availability = getRequestSubmissionAvailability();
 
   if (!availability.isConfigured) {
