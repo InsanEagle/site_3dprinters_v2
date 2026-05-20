@@ -3,7 +3,7 @@ import path from "path";
 import { randomUUID } from "crypto";
 import { createRequestAttachmentAccessToken, getRequestAttachmentAccessConfig } from "@/lib/request-attachment-access";
 import { RequestAttachment } from "@/lib/request-submission";
-import { readEnvText } from "@/lib/runtime-env";
+import { getPublicBaseUrl, readEnvText } from "@/lib/runtime-env";
 
 function resolveStorageDir(envName: string, fallbackPath: string) {
   const configuredPath = readEnvText(envName);
@@ -104,7 +104,12 @@ export async function saveRequestAttachments(files: File[], requestUrl: string):
   const uploadDirectory = path.join(REQUEST_ATTACHMENTS_STORAGE_ROOT, bucket);
   await mkdir(uploadDirectory, { recursive: true });
 
-  const origin = new URL(requestUrl).origin;
+  const origin = getPublicBaseUrl(requestUrl);
+
+  if (!origin) {
+    throw new Error("Public base URL is not configured for request attachment links.");
+  }
+
   const attachments: RequestAttachment[] = [];
 
   for (const file of files) {

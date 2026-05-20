@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { e2eOrdersDir, e2eRequestAttachmentsDir } from "./e2e-storage";
+import { e2eOrdersDir, e2eRequestAttachmentsDir, mockWebhookLogPath } from "./e2e-storage";
 
 const sampleImagePath = path.join(process.cwd(), "tests", "fixtures", "sample-image.png");
 const ordersDirPath = e2eOrdersDir;
@@ -109,6 +109,14 @@ async function getLatestRequestAttachmentFile(root = e2eRequestAttachmentsDir): 
   return stats.sort((left, right) => right.modifiedAt - left.modifiedAt)[0]?.filePath;
 }
 
+async function readLatestWebhookEvent() {
+  const log = await readFile(mockWebhookLogPath, "utf8").catch(() => "");
+  const lines = log.trim().split("\n").filter(Boolean);
+  const latestLine = lines.at(-1);
+
+  return latestLine ? JSON.parse(latestLine) : undefined;
+}
+
 test("smoke: home and catalog stay reachable without page overflow", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 900 });
 
@@ -162,6 +170,28 @@ test("smoke: request form submits successfully with an image", async ({ page }) 
     await expect.poll(async () => countRequestAttachmentFiles()).toBeGreaterThan(fileCountBefore);
     createdAttachmentFile = await getLatestRequestAttachmentFile();
     expect(createdAttachmentFile).toBeTruthy();
+
+    await expect
+      .poll(async () => {
+        const webhookEvent = await readLatestWebhookEvent();
+        return webhookEvent?.body?.payload?.attachments?.[0]?.url ?? "";
+      })
+      .toContain("https://example.test/api/request-attachments/");
+    await expect
+      .poll(async () => {
+        const webhookEvent = await readLatestWebhookEvent();
+        return webhookEvent?.body?.payload?.attachments?.[0]?.relativeUrl ?? "";
+      })
+      .toMatch(/^\/api\/request-attachments\//);
+
+    const webhookEvent = await readLatestWebhookEvent();
+    const attachmentUrl = webhookEvent.body.payload.attachments[0].url;
+    const attachmentRelativeUrl = webhookEvent.body.payload.attachments[0].relativeUrl;
+
+    expect(attachmentUrl).not.toContain("0.0.0.0");
+    expect(attachmentUrl).not.toContain("localhost");
+    expect(attachmentUrl).not.toContain("127.0.0.1");
+    expect(attachmentRelativeUrl).not.toContain("0.0.0.0");
   } finally {
     if (createdAttachmentFile) {
       await rm(createdAttachmentFile, { force: true });
@@ -229,7 +259,8 @@ test("smoke: public order status opens with a valid access link", async ({ page 
 
     expect(publicLink).toBeTruthy();
 
-    await page.goto(publicLink as string);
+    const publicUrl = new URL(publicLink as string);
+    await page.goto(`${publicUrl.pathname}${publicUrl.search}`);
     await expect(page.getByTestId("public-order-status-page")).toBeVisible();
     await expect(page.getByTestId("public-order-number")).toHaveText(fixture.orderNumber);
   } finally {

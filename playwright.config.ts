@@ -1,5 +1,5 @@
 import { defineConfig, devices } from "@playwright/test";
-import { e2eOrdersDir, e2eRequestAttachmentsDir } from "./tests/e2e-storage";
+import { e2eOrdersDir, e2eRequestAttachmentsDir, mockWebhookLogPath } from "./tests/e2e-storage";
 
 const port = 3011;
 
@@ -24,8 +24,11 @@ export default defineConfig({
     {
       command: "node tests/mock-webhook.cjs",
       url: "http://127.0.0.1:3999/health",
-      reuseExistingServer: true,
-      timeout: 30_000
+      reuseExistingServer: false,
+      timeout: 30_000,
+      env: {
+        MOCK_WEBHOOK_LOG_PATH: mockWebhookLogPath
+      }
     },
     {
       command:
@@ -35,6 +38,7 @@ export default defineConfig({
       timeout: 180_000,
       env: {
         PORT: String(port),
+        APP_URL: "https://example.test",
         REQUESTS_WEBHOOK_URL: "http://127.0.0.1:3999/",
         NEXT_PUBLIC_SITE_NAME: "Smoke Test Site",
         REQUEST_ATTACHMENTS_ACCESS_SECRET: "test-request-attachments-secret",
