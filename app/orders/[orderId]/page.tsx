@@ -18,6 +18,9 @@ export const metadata: Metadata = {
   description: "Публичная страница статуса заказа по безопасной ссылке."
 };
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function PublicOrderStatusPage({
   params,
   searchParams

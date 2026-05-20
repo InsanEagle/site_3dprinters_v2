@@ -14,6 +14,9 @@ import { getOrderAccessConfig, getPublicOrderStatusHref } from "@/lib/order-stat
 import { cn } from "@/lib/utils";
 import { retryOrderDeliveryAction, updateOrderStatusAction } from "../actions";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 function getContactHref(value: string) {
   const trimmedValue = value.trim();
 

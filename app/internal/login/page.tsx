@@ -4,6 +4,9 @@ import { Button } from "@/components/ui/button";
 import { getInternalAccessConfig, hasInternalAccess } from "@/lib/internal-access";
 import { loginToInternalBackoffice } from "./actions";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function InternalLoginPage({
   searchParams
 }: {

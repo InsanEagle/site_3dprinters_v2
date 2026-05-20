@@ -13,6 +13,9 @@ import {
 } from "@/lib/order-backoffice";
 import { cn } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function InternalOrdersPage({
   searchParams
 }: {
