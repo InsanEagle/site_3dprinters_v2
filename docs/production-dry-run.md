@@ -188,7 +188,9 @@ docker compose ps
 docker compose logs -f app
 ```
 
-The app listens on container port `3000`. Host port defaults to `3000` and can be changed with `APP_PORT`.
+The app listens on container port `3000`. Docker compose binds it only to loopback: `127.0.0.1:${APP_PORT:-3000}:3000`.
+
+After reverse proxy / HTTPS is enabled, do not expose host port `3000` publicly. Public traffic should enter through `80/443`, and Caddy/nginx/Traefik should proxy to `http://127.0.0.1:3000`.
 
 ## 6. Smoke Check After Startup
 
@@ -298,6 +300,9 @@ Expected shape:
 
 - Public HTTPS on `https://example.com`.
 - Let's Encrypt certificate managed by the proxy layer.
+- Public firewall allows `80/443`.
+- Host port `3000` stays closed externally and is reachable only as `127.0.0.1:3000` on the VPS.
+- SSH `22` should be restricted to your own IP `/32` where possible.
 - Proxy passes traffic to `http://127.0.0.1:3000`.
 - App env uses the public URL:
   - `NEXT_PUBLIC_SITE_URL=https://example.com`

@@ -367,7 +367,7 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
 
 ```bash
 docker build -t autodetail-fdm-mvp .
-docker run --rm -p 3000:3000 --env-file .env.production -v ./data/orders:/app/data/orders -v ./data/requests:/app/data/requests -v ./data/request-attachments:/app/data/request-attachments autodetail-fdm-mvp
+docker run --rm -p 127.0.0.1:3000:3000 --env-file .env.production -v ./data/orders:/app/data/orders -v ./data/requests:/app/data/requests -v ./data/request-attachments:/app/data/request-attachments autodetail-fdm-mvp
 ```
 
 ### Запуск через docker compose
@@ -386,7 +386,9 @@ docker compose --env-file .env.production up -d --build
 docker compose ps
 ```
 
-По умолчанию контейнер слушает `3000`, а наружный порт задается через `APP_PORT` или остается `3000`.
+По умолчанию контейнер слушает `3000`, а host binding ограничен loopback: `127.0.0.1:${APP_PORT:-3000}:3000`.
+После подключения reverse proxy / HTTPS внешний порт `3000` не должен быть открыт наружу. Публичный доступ должен идти через Caddy, nginx или Traefik на портах `80/443`, а proxy должен передавать запросы в Next.js на `http://127.0.0.1:3000`.
+SSH `22` на VPS лучше ограничить своим IP `/32` на firewall/security-group уровне.
 
 ### Production env
 
