@@ -59,6 +59,7 @@
 ```env
 NEXT_PUBLIC_SITE_NAME=Изготовление деталей
 NEXT_PUBLIC_SITE_URL=https://example.com
+NEXT_PUBLIC_YANDEX_METRIKA_ID=
 APP_URL=https://example.com
 REQUESTS_WEBHOOK_URL=https://your-endpoint.example/webhook
 REQUESTS_WEBHOOK_TOKEN=
@@ -85,6 +86,7 @@ ORDER_PUBLIC_ACCESS_SECRET=
 
 - `NEXT_PUBLIC_SITE_NAME` — имя сайта в webhook payload.
 - `NEXT_PUBLIC_SITE_URL` — публичный адрес сайта для SEO-URL в `/sitemap.xml`; в production укажите реальный домен, например `https://example.com`.
+- `NEXT_PUBLIC_YANDEX_METRIKA_ID` — опциональный ID счетчика Яндекс.Метрики; если пусто, скрипт Метрики не подключается. Это public env для клиентского bundle: при Docker/VPS значение должно быть доступно на этапе build, а после изменения нужен rebuild image.
 - `APP_URL` — публичный адрес сайта для operational links в order/webhook payload.
 - `REQUESTS_WEBHOOK_URL` — обязательный URL канала приема заявок и заказов.
 - `REQUESTS_WEBHOOK_TOKEN` — необязательный bearer token для webhook.

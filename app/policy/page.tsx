@@ -70,6 +70,9 @@ export default function PolicyPage() {
               таблицу, почту или мессенджер, если они настроены владельцем сайта. Эти каналы нужны только для обработки обращения
               и связи с вами.
             </p>
+            <p className="mt-4 text-base leading-7 text-body">
+              Если на сайте включена аналитика посещений, она используется для понимания работы страниц и улучшения сайта.
+            </p>
           </section>
 
           <section className="rounded-[32px] border border-line bg-surface p-8">

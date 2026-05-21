@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { YandexMetrika } from "@/components/analytics/yandex-metrika";
 import { CartProvider } from "@/components/cart/cart-provider";
 import { SiteShell } from "@/components/layout/site-shell";
 import { JsonLd } from "@/components/seo/json-ld";
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="ru">
       <body>
         <JsonLd data={createOrganizationJsonLd()} />
+        <YandexMetrika />
         <RequestModalProvider>
           <CartProvider>
             <SiteShell>{children}</SiteShell>

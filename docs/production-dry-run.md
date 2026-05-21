@@ -100,6 +100,7 @@ Optional:
 
 ```env
 REQUESTS_WEBHOOK_TOKEN=replace-if-receiver-requires-bearer-token
+NEXT_PUBLIC_YANDEX_METRIKA_ID=
 OPERATIONS_MESSENGER_WEBHOOK_URL=
 OPERATIONS_MESSENGER_WEBHOOK_TOKEN=
 OPERATIONS_MESSENGER_LABEL=
@@ -114,6 +115,7 @@ OPERATIONS_SHEETS_LABEL=
 Purpose:
 
 - `REQUESTS_WEBHOOK_TOKEN` — sent only server-side as bearer token to the primary receiver.
+- `NEXT_PUBLIC_YANDEX_METRIKA_ID` — optional Yandex Metrica counter ID. If it is empty, the Metrica script and noscript fallback are not added to the site. This is a public env value for the client bundle; on Docker/VPS it must be available during image build, and changing it requires rebuilding the Docker image so static pages include the updated counter.
 - `OPERATIONS_MESSENGER_WEBHOOK_*` — optional sidecar notification channel.
 - `OPERATIONS_EMAIL_WEBHOOK_*` — optional sidecar email channel.
 - `OPERATIONS_SHEETS_WEBHOOK_*` — optional sidecar sheet/table channel.
