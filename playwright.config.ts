@@ -31,8 +31,7 @@ export default defineConfig({
       }
     },
     {
-      command:
-        "powershell -NoProfile -Command \"npm.cmd run build; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; Copy-Item -Path '.next/static' -Destination '.next/standalone/.next/static' -Recurse -Force; Copy-Item -Path 'public' -Destination '.next/standalone/public' -Recurse -Force; node '.next/standalone/server.js'\"",
+      command: "node scripts/start-e2e-server.mjs",
       url: `http://127.0.0.1:${port}`,
       reuseExistingServer: false,
       timeout: 180_000,
