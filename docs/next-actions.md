@@ -31,7 +31,8 @@ Update rule: update this file after major project stages, launch-readiness chang
 ## NOW
 
 - Use the new ChatGPT + Codex workflow on the next real product task and adjust docs only if the workflow shows a gap.
-- Verify and polish the existing first-launch public product selection, SEO copy, and product content.
+- Manually review polished homepage and first-launch products on 390/768/1024/1280 widths.
+- Review product page SEO descriptions for first-launch SKU group.
 - Keep the working tree clean before starting new tasks.
 - Use a fresh AI-review after important or risky diffs.
 
@@ -81,6 +82,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Dependabot added.
 - PR template added.
 - Codex task issue template added.
+- First-launch homepage selection and copy polished.
 
 ## Working Rules
 
