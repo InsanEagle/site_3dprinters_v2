@@ -16,33 +16,45 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Ozon catalog refresh has been completed.
 - Basic `/policy` page has been added.
 - Codex task template has been added.
+- ChatGPT + Codex workflow has been formalized.
+- `.ai` quick-start layer has been added.
+- `npm run check:all` has been added as the standard full local check.
+- VS Code tasks have been added.
+- GitHub Actions CI with E2E has been added.
+- CodeQL analysis has been enabled through GitHub UI.
+- Dependabot has been added.
+- PR and Codex task issue templates have been added.
+- Ozon workflow has been documented.
+- Decision log has been added.
 - No known code-level P0 blockers are currently open.
 
 ## NOW
 
+- Use the new ChatGPT + Codex workflow on the next real product task and adjust docs only if the workflow shows a gap.
 - Finish and commit the first-launch popular products selection if a relevant diff already exists.
-- Check the first wave of products shown on the main page.
-- Update the VPS after that product selection, if needed.
-- Replace `webhook.site` with a production receiver later, not as the immediate next step.
-- Close or verify external port `3000` if it is not already closed.
+- Verify the first-launch popular products selection if it is not already finished.
+- Keep the working tree clean before starting new tasks.
+- Use a fresh AI-review after important or risky diffs.
 
 ## NEXT
 
-- Add `docs/catalog-ozon-workflow.md`.
-- Add `docs/decision-log.md`.
-- Add GitHub Actions CI.
+- Replace `webhook.site` with a production webhook receiver.
 - Add Yandex Metrica through env-based configuration.
 - Document backup script and cron setup.
 - Run a UX/copy audit for the first wave of products.
+- Switch from `sslip.io` to a real domain.
+- Update product content and SEO descriptions where real product data is available.
+- Consider optional `markdownlint` later if Markdown drift becomes a recurring problem.
 
 ## LATER
 
-- Set up a Make/n8n production receiver.
-- Switch from `sslip.io` to a real domain.
-- Improve SEO descriptions.
+- Add Make/n8n automation after the production receiver path is chosen.
+- Add CRM, Sheets, or Telegram workflow after real operations show the right shape.
+- Add Sentry before public launch if runtime observability becomes necessary.
+- Add branch protection later if the project moves to a PR-based workflow.
 - Expand the internal backoffice after real operational usage shows what is needed.
+- Do not add Husky for now.
 - Add online payment only after the direct-sale scenario is stable.
-- Add CRM, Sheets, or Telegram automation.
 
 ## DONE
 
@@ -57,12 +69,26 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Ozon import refreshed.
 - Basic policy page added.
 - Codex task template added.
+- Next actions tracker added.
+- Decision log added.
+- Ozon catalog workflow doc added.
+- Docs navigation added.
+- `.ai` workspace prompts added.
+- `typecheck` and `check:all` scripts added.
+- VS Code tasks added.
+- AI-review workflow docs added.
+- GitHub Actions CI with E2E added.
+- CodeQL analysis enabled through GitHub UI.
+- Dependabot added.
+- PR template added.
+- Codex task issue template added.
 
 ## Working Rules
 
 - One task should produce one small, focused diff.
+- For normal small tasks, use a short prompt from `.ai/COMMON_PROMPTS.md` when it fits.
 - Risky tasks should start as analysis-only.
-- Risky implemented diffs should get a fresh AI-review before commit or deployment.
+- Risky implemented diffs must get a fresh AI-review before commit or deployment.
 - Codex should not commit by itself.
 - Before commit, run:
 
@@ -72,13 +98,17 @@ git status --short -uall
 
 - Do not commit raw, runtime, private, generated-local, uploaded, backup, `.env`, `.next`, or `node_modules` files.
 - Local Windows commands must be PowerShell-friendly.
-- Full local checks should use `npm run check:all`.
+- Use `npm run check:all` as the standard full check before commit when the change affects code, runtime behavior, CI, E2E, or public product flow.
+- Use separate `npm run lint`, `npm run typecheck`, `npm run build`, or `npm run test:e2e` commands for targeted diagnostics.
+- Do not run the same checks twice without a clear reason.
 - Linux/bash commands are allowed only when clearly labeled as VPS/Linux.
 
 ## Open Questions
 
 - When should the production webhook receiver replace the temporary receiver?
-- Which 20-30 SKU should stay in the first launch wave?
 - When should the real domain be bought and connected?
+- Which 20-30 SKU should stay in the first launch wave?
 - Is Yandex Metrica needed before the first client showing?
+- Is `markdownlint` worth adding later?
+- Is branch protection needed later if the project moves to PR-based work?
 - When should requests move into a fuller CRM workflow?
