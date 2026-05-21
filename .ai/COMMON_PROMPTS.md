@@ -33,3 +33,13 @@ Read `AGENTS.md`, `docs/catalog-ozon-workflow.md`, `docs/project-state.md`, `doc
 ## H. Docs-only task
 
 Read `AGENTS.md` and relevant docs from `docs/*`. Make only the requested documentation change. Do not change application code, business logic, `package.json`, CI, Docker/VPS config, catalog data, importer, or unrelated docs. Use Windows + VS Code workflow and PowerShell-friendly commands. Run `git diff --check` and inspect changed files; skip `npm run check:all` if the change is Markdown-only and explain why. Report changed files, checks, risks, and a suggested commit message. Do not commit unless explicitly asked.
+
+## I. Three-level workflow with approval gates
+
+Read `AGENTS.md`, `.ai/README.md`, `docs/project-state.md`, `docs/next-actions.md`, `docs/code-review.md`, `docs/decision-log.md`, and any task-relevant docs. Run the task as a 3-level workflow in this same Codex chat. Do not commit unless explicitly asked.
+
+LEVEL 1 - AUDIT: do not change files. Inspect relevant files, describe current behavior, identify risks, propose the minimal implementation plan, list checks to run, then stop with exactly: `WAITING FOR APPROVE TO IMPLEMENT`.
+
+LEVEL 2 - IMPLEMENT: start only after the user explicitly writes `APPROVE`. Implement only the approved plan, keep the diff minimal, do not touch unrelated files, and do not add dependencies without a project-specific reason. Run relevant checks, or `npm run check:all` when appropriate, then stop with exactly: `WAITING FOR APPROVE TO REVIEW`.
+
+LEVEL 3 - REVIEW: start only after the user explicitly writes `APPROVE`. Act as a strict reviewer, do not change files, review the current `git diff`, classify issues as P0/P1/P2, check `docs/decision-log.md` and `docs/code-review.md`, and say `can commit` or `must fix`. Do not fix issues without a separate explicit `APPROVE`.

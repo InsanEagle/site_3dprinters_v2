@@ -40,6 +40,7 @@ Level 3: Review
 - Suggest a minimal fix plan for confirmed issues.
 
 For risky areas, use all 3 levels. For simple docs-only tasks, Audit and Review can be lightweight or skipped with a clear explanation.
+For complex tasks that should stay in one Codex chat, use the combined approval-gated prompt from `.ai/COMMON_PROMPTS.md`.
 
 ## Source Map
 
