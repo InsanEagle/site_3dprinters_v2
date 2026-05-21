@@ -7,14 +7,14 @@ import { HeroSection } from "@/components/shared/hero-section";
 import { ProductCard } from "@/components/shared/product-card";
 import { SectionTitle } from "@/components/shared/section-title";
 import { Timeline } from "@/components/shared/timeline";
-import { products } from "@/data/site";
+import { homepageFeaturedProducts } from "@/data/site";
 import { faqContent, homeContent, servicesContent, trustContent } from "@/data/content";
 import { HomeActions } from "@/components/page/home-actions";
 
 export default function HomePage() {
   const publishedTrustItems =
     trustContent.sectionMode === "hide_if_no_real_data" ? [] : [];
-  const catalogPreviewProducts = products.filter((product) => product.images.length > 0 && product.category !== "repair-parts").slice(0, 6);
+  const popularProducts = homepageFeaturedProducts.slice(0, 12);
 
   return (
     <>
@@ -78,9 +78,23 @@ export default function HomePage() {
 
       <section className="py-16 sm:py-20">
         <Container>
-          <SectionTitle eyebrow="Каталог" title="Примеры типовых позиций" description="Каталог можно использовать как отправную точку для подбора похожих изделий и обращения по своей задаче." />
+          <SectionTitle
+            eyebrow="Каталог"
+            title="Популярные позиции по заказам"
+            description="Эти детали чаще всего заказывали на маркетплейсе. На сайте можно уточнить изготовление, наличие или подобрать похожий аналог под свою задачу."
+            actions={
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Button href="/catalog" variant="secondary">
+                  Смотреть каталог
+                </Button>
+                <Button href="/contacts">
+                  Оставить заявку
+                </Button>
+              </div>
+            }
+          />
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-            {catalogPreviewProducts.map((product) => (
+            {popularProducts.map((product) => (
               <ProductCard key={product.slug} product={product} />
             ))}
           </div>

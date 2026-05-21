@@ -98,6 +98,54 @@ const inquiryRepairSkus = new Set([
   "KANC237"
 ]);
 
+export const firstLaunchProductSkus = [
+  "KANC367",
+  "KANC299",
+  "KANC378",
+  "KANC361",
+  "KANC237",
+  "KANC36",
+  "KANC38",
+  "KANC462",
+  "KANC260",
+  "KANC349",
+  "KANC262",
+  "KANC476",
+  "KANC324",
+  "KANC284",
+  "KANC441",
+  "KANC254",
+  "KANC285",
+  "KANC265",
+  "KANC259",
+  "KANC220",
+  "KANC352",
+  "KANC358",
+  "KANC23",
+  "KANC323",
+  "KANC289",
+  "KANC470",
+  "KANC475",
+  "KANC442",
+  "KANC377",
+  "KANC300"
+] as const;
+
+export const homepageFeaturedProductSkus = [
+  "KANC367",
+  "KANC299",
+  "KANC378",
+  "KANC237",
+  "KANC260",
+  "KANC349",
+  "KANC262",
+  "KANC462",
+  "KANC324",
+  "KANC284",
+  "KANC441",
+  "KANC476"
+] as const;
+
 const categoryBySlug = new Map(publicCategories.map((category) => [category.slug, category]));
 const categoryOrder = new Map(publicCategories.map((category, index) => [category.slug, index]));
 
@@ -156,3 +204,15 @@ export const products: Product[] = importedProducts
 
     return left.name.localeCompare(right.name, "ru");
   });
+
+function getPublicProductsBySkuList(skus: readonly string[]) {
+  const productBySku = new Map(products.map((product) => [product.sku, product]));
+
+  return skus
+    .map((sku) => productBySku.get(sku))
+    .filter((product): product is Product => Boolean(product));
+}
+
+export const firstLaunchProducts: Product[] = getPublicProductsBySkuList(firstLaunchProductSkus);
+
+export const homepageFeaturedProducts: Product[] = getPublicProductsBySkuList(homepageFeaturedProductSkus);
