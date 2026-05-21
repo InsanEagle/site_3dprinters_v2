@@ -15,17 +15,18 @@ import {
   getProductScenarioLabel
 } from "@/lib/catalog";
 import { getSafeText } from "@/lib/content";
+import { cn } from "@/lib/utils";
 import { Product } from "@/types";
 
-function ProductCardMedia({ product, primaryImage }: { product: Product; primaryImage?: string }) {
+function ProductCardMedia({ product, primaryImage, compact }: { product: Product; primaryImage?: string; compact?: boolean }) {
   if (primaryImage) {
     return (
       <ProductImageStage
         image={primaryImage}
         title={product.name}
         tone={product.imageTone ?? "neutral"}
-        size="card"
-        className="mb-5"
+        size={compact ? "thumbnail" : "card"}
+        className={compact ? "mb-4" : "mb-5"}
         testId={`product-card-media-${product.slug}`}
       />
     );
@@ -38,7 +39,7 @@ function ProductCardMedia({ product, primaryImage }: { product: Product; primary
     >
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(246,247,248,0.98)_58%,rgba(236,240,244,1)_100%)]" />
       <div className="absolute inset-x-[8%] inset-y-[10%] rounded-[24px] border border-white/70 bg-[radial-gradient(circle_at_50%_36%,rgba(255,255,255,0.96)_0%,rgba(249,250,251,0.86)_40%,rgba(243,245,247,0.18)_72%,rgba(243,245,247,0)_100%)]" />
-      <div className="relative flex h-64 flex-col justify-between p-5 sm:h-72 sm:p-6">
+      <div className={cn("relative flex flex-col justify-between p-5 sm:p-6", compact ? "h-52 sm:h-64" : "h-64 sm:h-72")}>
         <span className="w-fit rounded-full bg-white/90 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-body shadow-[0_4px_12px_rgba(31,35,40,0.04)]">
           Без фото
         </span>
@@ -51,7 +52,7 @@ function ProductCardMedia({ product, primaryImage }: { product: Product; primary
   );
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
   const summary = getSafeText(product.shortDescription) ?? getSafeText(product.compatibility) ?? productContent.compatibilityFallback;
   const price = getProductPriceLabel(product) ?? productContent.priceFallback;
   const images = getProductImages(product.images);
@@ -67,27 +68,30 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <article
       data-testid={`product-card-${product.slug}`}
-      className="group flex h-full flex-col rounded-3xl border border-line bg-white p-5 transition hover:-translate-y-0.5 hover:border-accent/45 hover:shadow-card"
+      className={cn(
+        "group flex h-full flex-col border border-line bg-white transition hover:-translate-y-0.5 hover:border-accent/45 hover:shadow-card",
+        compact ? "rounded-[24px] p-4 sm:rounded-3xl sm:p-5" : "rounded-3xl p-5"
+      )}
     >
-      <ProductCardMedia product={product} primaryImage={primaryImage} />
+      <ProductCardMedia product={product} primaryImage={primaryImage} compact={compact} />
       <p className="text-sm text-body">{product.categoryLabel}</p>
-      <h3 className="mt-2 text-xl font-semibold text-ink">{product.name}</h3>
+      <h3 className={cn("mt-2 font-semibold text-ink", compact ? "text-lg leading-7 sm:text-xl" : "text-xl")}>{product.name}</h3>
       <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.08em]">
         <span className="rounded-full bg-surface px-3 py-1 text-body">{salesModeLabel}</span>
         <span className="rounded-full bg-surface px-3 py-1 text-body">{availabilityLabel}</span>
       </div>
-      <p className="mt-3 text-sm leading-6 text-body">{summary}</p>
+      <p className={cn("mt-3 text-sm leading-6 text-body", compact ? "hidden sm:block" : "")}>{summary}</p>
       <div className="mt-auto pt-5">
         <p className="text-xs font-semibold uppercase tracking-[0.08em] text-accent">{scenarioLabel}</p>
         <div className="mt-2 flex flex-col gap-4">
           <div className="flex items-end justify-between gap-4">
-            <span className="text-lg font-semibold text-ink">{price}</span>
+            <span className={cn("font-semibold text-ink", compact ? "text-base sm:text-lg" : "text-lg")}>{price}</span>
             {canAddToCart ? (
               <Link href={`/product/${product.slug}`} className="text-sm font-semibold text-body transition hover:text-ink">
                 Подробнее
               </Link>
             ) : (
-              <Button href={cardHref} variant="secondary" className="px-4 py-2.5">
+              <Button href={cardHref} variant="secondary" className={compact ? "px-3.5 py-2.5" : "px-4 py-2.5"}>
                 {ctaLabel}
               </Button>
             )}
@@ -95,7 +99,7 @@ export function ProductCard({ product }: { product: Product }) {
           {canAddToCart ? (
             <AddToCartButton slug={product.slug} className="w-full" />
           ) : (
-            <p className="text-sm leading-6 text-body">{cartStatusMessage}</p>
+            <p className={cn("text-sm leading-6 text-body", compact ? "hidden sm:block" : "")}>{cartStatusMessage}</p>
           )}
         </div>
       </div>

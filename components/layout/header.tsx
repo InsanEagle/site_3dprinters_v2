@@ -77,10 +77,19 @@ export function Header() {
           </Button>
         </div>
       </Container>
-      <div className="overflow-hidden border-t border-line xl:hidden">
-        <Container className="flex min-w-0 gap-4 overflow-x-auto py-3">
+      <div className="border-t border-line bg-surface/70 xl:hidden">
+        <Container className="flex min-w-0 flex-wrap gap-2 py-2.5 sm:gap-3 sm:py-3">
           {navigation.map((item) => (
-            <Link key={item.href} href={item.href} className="shrink-0 text-sm font-medium text-body">
+            <Link
+              key={item.href}
+              href={item.href}
+              className={cn(
+                "rounded-full border px-3 py-1.5 text-xs font-semibold transition sm:px-3.5 sm:py-2 sm:text-sm",
+                pathname === item.href || pathname?.startsWith(`${item.href}/`)
+                  ? "border-accent/30 bg-white text-ink"
+                  : "border-line bg-white/80 text-body hover:border-accent/30 hover:text-ink"
+              )}
+            >
               {item.label}
             </Link>
           ))}

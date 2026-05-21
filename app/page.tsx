@@ -93,9 +93,9 @@ export default function HomePage() {
               </div>
             }
           />
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
             {popularProducts.map((product) => (
-              <ProductCard key={product.slug} product={product} />
+              <ProductCard key={product.slug} product={product} compact />
             ))}
           </div>
         </Container>
