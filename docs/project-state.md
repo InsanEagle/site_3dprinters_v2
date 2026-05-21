@@ -52,6 +52,13 @@ Needs verification before real production:
 - Firewall hardening for port `3000` and SSH.
 - Personal data processing policy.
 
+Workflow source-of-truth docs have been added and should be used by new Codex chats and human maintainers:
+
+- `docs/codex-task-template.md` — task-packet template for new Codex chats.
+- `docs/next-actions.md` — current Now/Next/Later/Done tracker.
+- `docs/decision-log.md` — accepted product and architecture decisions.
+- `docs/catalog-ozon-workflow.md` — safe Ozon import and public visibility workflow.
+
 ## 3. Implemented features
 
 - Main page.

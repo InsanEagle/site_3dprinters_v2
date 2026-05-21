@@ -8,6 +8,18 @@
 4. Запустите проект: `npm run dev`.
 5. Откройте `http://localhost:3000`.
 
+## Project documentation map
+
+- [AGENTS.md](AGENTS.md) — правила для Codex/agents и ограничения проекта.
+- [docs/project-state.md](docs/project-state.md) — текущее состояние MVP, архитектура, риски и roadmap.
+- [docs/next-actions.md](docs/next-actions.md) — актуальный Now/Next/Later/Done tracker.
+- [docs/decision-log.md](docs/decision-log.md) — принятые product/architecture decisions.
+- [docs/code-review.md](docs/code-review.md) — правила review и приоритеты проверки.
+- [docs/codex-task-template.md](docs/codex-task-template.md) — шаблон task-packet для новых Codex-чатов.
+- [docs/catalog-ozon-workflow.md](docs/catalog-ozon-workflow.md) — безопасный workflow Ozon import/public visibility.
+- [docs/production-dry-run.md](docs/production-dry-run.md) — VPS/deploy runbook.
+- [docs/vps-dry-run-result.md](docs/vps-dry-run-result.md) — historical VPS/HTTPS dry run result.
+
 ## Что сейчас реализовано
 
 - `Next.js + TypeScript + Tailwind CSS`

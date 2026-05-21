@@ -29,6 +29,21 @@ Core MVP goals:
 - Avoid heavy dependencies unless there is a strong project-specific reason.
 - Prefer existing local patterns, helpers, and modules over new abstractions.
 
+## Before Starting A Task
+
+Read the current source-of-truth docs before editing:
+
+- `docs/project-state.md` — current MVP state, architecture, blockers, and roadmap.
+- `docs/next-actions.md` — current Now/Next/Later/Done tracker.
+- `docs/decision-log.md` — accepted product and architecture decisions.
+- `docs/code-review.md` — review rules and expectations.
+- `docs/codex-task-template.md` — task-packet template for new Codex chats.
+- A profile-specific doc when relevant, for example `docs/catalog-ozon-workflow.md` for Ozon/catalog import tasks or `docs/production-dry-run.md` for VPS/deploy tasks.
+
+Use Windows, VS Code, and PowerShell-friendly local commands unless a step is explicitly for Linux/VPS.
+
+Keep the working shape small: one task should produce one small, focused diff.
+
 ## Hard Prohibitions
 
 - Do not rewrite the project from scratch.
