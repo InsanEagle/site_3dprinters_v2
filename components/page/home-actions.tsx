@@ -38,10 +38,10 @@ export function HomeActions({ compact = false, cta = false }: { compact?: boolea
 
   return (
     <>
-      <Button href="/catalog">{homeContent.heroSecondaryCta}</Button>
-      <Button onClick={() => openModal({ ...requestCopy, title: homeContent.heroPrimaryCta, source: "home:hero" })} variant="secondary">
+      <Button onClick={() => openModal({ ...requestCopy, title: homeContent.heroPrimaryCta, source: "home:hero" })}>
         {homeContent.heroPrimaryCta}
       </Button>
+      <Button href="/catalog" variant="secondary">{homeContent.heroSecondaryCta}</Button>
     </>
   );
 }

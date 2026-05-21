@@ -81,7 +81,7 @@ export default function HomePage() {
           <SectionTitle
             eyebrow="Каталог"
             title="Популярные позиции по заказам"
-            description="Эти детали чаще всего заказывали на маркетплейсе. На сайте можно уточнить изготовление, наличие или подобрать похожий аналог под свою задачу."
+            description="Подборка позиций из первого запуска: по ним можно открыть карточку, уточнить наличие, изготовление или подобрать похожий вариант под свою задачу."
             actions={
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Button href="/catalog" variant="secondary">
@@ -118,19 +118,6 @@ export default function HomePage() {
         <Container>
           <SectionTitle eyebrow="Процесс" title={homeContent.processTitle} />
           <Timeline steps={homeContent.processSteps} />
-        </Container>
-      </section>
-
-      <section className="border-y border-line bg-surface py-16 sm:py-20">
-        <Container>
-          <SectionTitle eyebrow="Почему начать легко" title={homeContent.whyTitle} />
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {homeContent.whyItems.map((item) => (
-              <article key={item} className="rounded-3xl border border-line bg-white p-6">
-                <p className="text-base font-semibold leading-7 text-ink">{item}</p>
-              </article>
-            ))}
-          </div>
         </Container>
       </section>
 
