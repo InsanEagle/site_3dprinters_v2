@@ -59,15 +59,19 @@
 ```env
 NEXT_PUBLIC_SITE_NAME=Изготовление деталей
 NEXT_PUBLIC_SITE_URL=https://example.com
+APP_URL=https://example.com
 REQUESTS_WEBHOOK_URL=https://your-endpoint.example/webhook
 REQUESTS_WEBHOOK_TOKEN=
 REQUESTS_WEBHOOK_TIMEOUT_MS=10000
 OPERATIONS_MESSENGER_WEBHOOK_URL=
 OPERATIONS_MESSENGER_WEBHOOK_TOKEN=
+OPERATIONS_MESSENGER_LABEL=
 OPERATIONS_EMAIL_WEBHOOK_URL=
 OPERATIONS_EMAIL_WEBHOOK_TOKEN=
+OPERATIONS_EMAIL_LABEL=
 OPERATIONS_SHEETS_WEBHOOK_URL=
 OPERATIONS_SHEETS_WEBHOOK_TOKEN=
+OPERATIONS_SHEETS_LABEL=
 ORDERS_DATA_DIR=
 REQUESTS_DATA_DIR=
 REQUEST_ATTACHMENTS_DIR=
@@ -81,12 +85,14 @@ ORDER_PUBLIC_ACCESS_SECRET=
 
 - `NEXT_PUBLIC_SITE_NAME` — имя сайта в webhook payload.
 - `NEXT_PUBLIC_SITE_URL` — публичный адрес сайта для SEO-URL в `/sitemap.xml`; в production укажите реальный домен, например `https://example.com`.
+- `APP_URL` — публичный адрес сайта для operational links в order/webhook payload.
 - `REQUESTS_WEBHOOK_URL` — обязательный URL канала приема заявок и заказов.
 - `REQUESTS_WEBHOOK_TOKEN` — необязательный bearer token для webhook.
 - `REQUESTS_WEBHOOK_TIMEOUT_MS` — таймаут доставки primary webhook; по умолчанию `10000`, допустимый диапазон ограничивается кодом от 1000 до 30000 мс.
 - `OPERATIONS_MESSENGER_WEBHOOK_URL` / `OPERATIONS_MESSENGER_WEBHOOK_TOKEN` — опциональный канал для уведомления в мессенджер через webhook-адаптер.
 - `OPERATIONS_EMAIL_WEBHOOK_URL` / `OPERATIONS_EMAIL_WEBHOOK_TOKEN` — опциональный канал для email-уведомления через webhook-адаптер.
 - `OPERATIONS_SHEETS_WEBHOOK_URL` / `OPERATIONS_SHEETS_WEBHOOK_TOKEN` — опциональный канал для записи в Google Sheets или аналогичную таблицу через webhook-адаптер.
+- `OPERATIONS_MESSENGER_LABEL` / `OPERATIONS_EMAIL_LABEL` / `OPERATIONS_SHEETS_LABEL` — опциональные человекочитаемые имена sidecar-каналов для backoffice и delivery status output.
 - `ORDERS_DATA_DIR` — опциональный override директории заказов; по умолчанию `data/orders`.
 - `REQUESTS_DATA_DIR` — опциональный override директории заявок; по умолчанию `data/requests`.
 - `REQUEST_ATTACHMENTS_DIR` — опциональный override директории вложений заявок; по умолчанию `data/request-attachments`.
@@ -380,9 +386,9 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
 
 Подробный production dry run перед реальным VPS-запуском описан в [docs/production-dry-run.md](docs/production-dry-run.md).
 
-### Локальная проверка образа
+### Локальная проверка образа на Windows / PowerShell
 
-```bash
+```powershell
 docker build -t autodetail-fdm-mvp .
 docker run --rm -p 127.0.0.1:3000:3000 --env-file .env.production -v ./data/orders:/app/data/orders -v ./data/requests:/app/data/requests -v ./data/request-attachments:/app/data/request-attachments autodetail-fdm-mvp
 ```
@@ -390,7 +396,15 @@ docker run --rm -p 127.0.0.1:3000:3000 --env-file .env.production -v ./data/orde
 ### Запуск через docker compose
 
 1. Создайте production env-файл вне Git, например `.env.production`, на основе `.env.example`.
-2. Убедитесь, что runtime-директории существуют:
+2. Убедитесь, что runtime-директории существуют.
+
+Локально на Windows / PowerShell:
+
+```powershell
+New-Item -ItemType Directory -Force data/orders, data/requests, data/request-attachments | Out-Null
+```
+
+На VPS/Linux:
 
 ```bash
 mkdir -p data/orders data/requests data/request-attachments
@@ -398,7 +412,7 @@ mkdir -p data/orders data/requests data/request-attachments
 
 3. Запустите:
 
-```bash
+```powershell
 docker compose --env-file .env.production up -d --build
 docker compose ps
 ```
@@ -451,6 +465,7 @@ sudo chown -R 1001:1001 data/orders data/requests data/request-attachments
 Минимальный backup перед деплоем или обновлением:
 
 ```bash
+# VPS/Linux only
 mkdir -p backups
 tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
 ```
@@ -458,6 +473,7 @@ tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/reques
 Restore:
 
 ```bash
+# VPS/Linux only
 docker compose stop app
 tar -xzf backups/site-data-YYYYMMDD-HHMMSS.tar.gz
 docker compose up -d

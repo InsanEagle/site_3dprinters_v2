@@ -79,6 +79,7 @@ Required constraints:
 - Do not use fake descriptions, reviews, ratings, prices, stock states, testimonials, or made-up Ozon URLs.
 - Do not expose secrets to client code or public docs.
 - Do not hide production misconfiguration behind fake success states.
+- If the task changes project logic, architecture, env, workflow, catalog visibility, launch state, or review rules, check whether Codex-facing docs also need updates: `.ai/README.md`, `.ai/COMMON_PROMPTS.md`, `docs/codex-task-template.md`, `docs/next-actions.md`, `docs/decision-log.md`, `docs/code-review.md`, `docs/catalog-ozon-workflow.md`, `docs/project-state.md`, and `README.md`.
 
 Task-specific constraints:
 

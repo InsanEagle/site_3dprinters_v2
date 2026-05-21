@@ -91,6 +91,7 @@ Before approving or finalizing a task, check:
 - No fake products, prices, ratings, availability, reviews, or Ozon URLs were added.
 - No secrets are exposed to client code or committed docs.
 - New env variables are documented in `.env.example` and README when relevant.
+- Changes to project logic, architecture, env, workflow, catalog visibility, launch state, or review rules are reflected in the relevant Codex-facing docs.
 - Dependencies are justified and minimal.
 - `npm run lint` was run when relevant.
 - `npx tsc --noEmit --incremental false` was run when relevant.

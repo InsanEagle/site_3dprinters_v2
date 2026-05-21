@@ -31,8 +31,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 ## NOW
 
 - Use the new ChatGPT + Codex workflow on the next real product task and adjust docs only if the workflow shows a gap.
-- Finish and commit the first-launch popular products selection if a relevant diff already exists.
-- Verify the first-launch popular products selection if it is not already finished.
+- Verify and polish the existing first-launch public product selection, SEO copy, and product content.
 - Keep the working tree clean before starting new tasks.
 - Use a fresh AI-review after important or risky diffs.
 

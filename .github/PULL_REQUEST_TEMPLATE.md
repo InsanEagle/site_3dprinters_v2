@@ -20,11 +20,13 @@
 
 ## Checks
 
+- Full local pass:
+- [ ] `npm run check:all`
+- Individual diagnostics / scoped checks if run separately:
 - [ ] `npm run lint`
 - [ ] `npm run typecheck`
 - [ ] `npm run build`
 - [ ] `npm run test:e2e`
-- [ ] `npm run check:all`
 - [ ] GitHub Actions green
 - [ ] Not run because this is docs-only; explanation below
 

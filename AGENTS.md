@@ -72,10 +72,13 @@ Keep the working shape small: one task should produce one small, focused diff.
 
 Run checks appropriate to the change:
 
+- `npm run check:all` as the standard full local check when changes affect code, runtime behavior, CI, E2E, or public product flows.
 - `npm run lint`
-- `npx tsc --noEmit --incremental false`
+- `npm run typecheck`
 - `npm run build` when safe and relevant
 - Relevant smoke/E2E checks when they exist and are safe to run
+
+Use individual checks for targeted diagnostics or scoped verification. Do not run both `npm run check:all` and every individual check unless there is a clear reason.
 
 If a check cannot be run safely, say why and describe the residual risk.
 

@@ -60,11 +60,12 @@ Concrete criteria for accepting this task:
 
 ## Required checks
 
+- [ ] Full local pass: `npm run check:all`
+- [ ] Individual diagnostics / scoped checks only if needed:
 - [ ] `npm run lint`
 - [ ] `npm run typecheck`
 - [ ] `npm run build`
 - [ ] `npm run test:e2e`
-- [ ] `npm run check:all`
 - [ ] GitHub Actions green
 - [ ] Explain if skipped because docs-only.
 

@@ -102,10 +102,13 @@ Optional:
 REQUESTS_WEBHOOK_TOKEN=replace-if-receiver-requires-bearer-token
 OPERATIONS_MESSENGER_WEBHOOK_URL=
 OPERATIONS_MESSENGER_WEBHOOK_TOKEN=
+OPERATIONS_MESSENGER_LABEL=
 OPERATIONS_EMAIL_WEBHOOK_URL=
 OPERATIONS_EMAIL_WEBHOOK_TOKEN=
+OPERATIONS_EMAIL_LABEL=
 OPERATIONS_SHEETS_WEBHOOK_URL=
 OPERATIONS_SHEETS_WEBHOOK_TOKEN=
+OPERATIONS_SHEETS_LABEL=
 ```
 
 Purpose:
@@ -114,6 +117,7 @@ Purpose:
 - `OPERATIONS_MESSENGER_WEBHOOK_*` — optional sidecar notification channel.
 - `OPERATIONS_EMAIL_WEBHOOK_*` — optional sidecar email channel.
 - `OPERATIONS_SHEETS_WEBHOOK_*` — optional sidecar sheet/table channel.
+- `OPERATIONS_*_LABEL` — optional human-readable labels for sidecar channels in backoffice and delivery status output.
 
 Storage overrides normally stay empty in production:
 

@@ -50,7 +50,7 @@ Needs verification before real production:
 - Real webhook receiver instead of test receiver.
 - Regular backup schedule and restore rehearsal.
 - Firewall hardening for port `3000` and SSH.
-- Personal data processing policy.
+- Legal/privacy readiness for real production.
 
 Workflow source-of-truth docs have been added and should be used by new Codex chats and human maintainers:
 
@@ -66,7 +66,7 @@ Workflow source-of-truth docs have been added and should be used by new Codex ch
 - Category pages.
 - Individual product pages.
 - Service pages for custom manufacturing and 3D scanning.
-- Supporting pages: delivery, FAQ, contacts, about, thanks.
+- Supporting pages: delivery, FAQ, contacts, about, policy, thanks.
 - Request form with client and server validation.
 - Request image attachments: JPG, PNG, WEBP, limited file count and file size.
 - Primary webhook delivery for requests.
@@ -79,6 +79,7 @@ Workflow source-of-truth docs have been added and should be used by new Codex ch
 - Sitemap.
 - Robots.
 - ESLint pipeline via `npm run lint`.
+- First-launch public product selection exists through `data/catalog-public.ts`; product content and SEO copy may still need polish.
 
 ## 4. Known P0 issues
 
@@ -155,7 +156,7 @@ Remaining P0:
 2. Replace `webhook.site` with a real webhook receiver.
 3. Configure recurring backup for `data/orders`, `data/requests`, and `data/request-attachments`.
 4. Close external port `3000` and restrict SSH to the operator IP where possible.
-5. Prepare personal data processing policy before public launch.
+5. Prepare legal/privacy readiness before public launch.
 6. Connect analytics.
 7. Review checkout/product CTAs so the public flow stays inquiry-first unless direct-sale data is real.
 8. Add or verify real Ozon URLs before using marketplace handoff as a serious user path.
