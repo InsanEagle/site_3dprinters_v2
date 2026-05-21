@@ -136,8 +136,14 @@ Expected analysis-only output:
 Default checks for code changes:
 
 ```powershell
+npm run check:all
+```
+
+Use separate commands for diagnostics when the aggregate check fails or only one layer is relevant:
+
+```powershell
 npm run lint
-npx tsc --noEmit --incremental false
+npm run typecheck
 npm run build
 npm run test:e2e
 ```
@@ -240,7 +246,7 @@ Use PowerShell-friendly commands locally:
 git status --short -uall
 git diff --cached --name-status
 npm run lint
-npx tsc --noEmit --incremental false
+npm run typecheck
 npm run build
 npm run test:e2e
 ```
@@ -380,7 +386,7 @@ Do not edit:
 ## Required Checks
 
 - `npm run lint`
-- `npx tsc --noEmit --incremental false`
+- `npm run typecheck`
 - `npm run build`
 - `npm run test:e2e`
 

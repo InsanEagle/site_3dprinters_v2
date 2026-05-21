@@ -333,9 +333,14 @@ ORDER_PUBLIC_ACCESS_SECRET=separate-public-order-secret
 Доступные команды:
 
 - `npm run dev`
+- `npm run lint`
+- `npm run typecheck`
 - `npm run build`
 - `npm run start`
 - `npm run test:e2e`
+- `npm run check:all`
+
+`npm run check:all` runs the full local check sequence: lint, typecheck, build, and E2E tests. Use the separate commands above for diagnostics.
 
 Текущее состояние тестов:
 

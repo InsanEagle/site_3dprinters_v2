@@ -71,6 +71,7 @@ git status --short -uall
 
 - Do not commit raw, runtime, private, generated-local, uploaded, backup, `.env`, `.next`, or `node_modules` files.
 - Local Windows commands must be PowerShell-friendly.
+- Full local checks should use `npm run check:all`.
 - Linux/bash commands are allowed only when clearly labeled as VPS/Linux.
 
 ## Open Questions

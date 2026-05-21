@@ -7,6 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
+    "typecheck": "tsc --noEmit --incremental false",
+    "check:all": "npm run lint && npm run typecheck && npm run build && npm run test:e2e",
     "test:e2e": "playwright test",
     "catalog:build": "node scripts/build-ozon-catalog.mjs"
   },
