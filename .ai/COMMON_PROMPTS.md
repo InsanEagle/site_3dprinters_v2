@@ -12,7 +12,7 @@ Read `AGENTS.md`, `docs/project-state.md`, `docs/next-actions.md`, `docs/decisio
 
 ## C. Review current diff
 
-Read `AGENTS.md` and `docs/code-review.md`. Review the current git diff as a code review; do not change files. Focus on P0/P1 regressions, broken routes, env/secrets, request honesty, SEO truthfulness, Windows workflow, and unrelated changes. Report findings first, then checks run or skipped, residual risks, and a suggested commit message if the diff is acceptable. Do not commit unless explicitly asked.
+Read `AGENTS.md`, `docs/decision-log.md`, and `docs/code-review.md`. Review the current git diff as a code review; do not change files. Run `git diff` and inspect the changed files only as needed to understand the diff. Classify findings as P0/P1/P2 and report findings first. Look specifically for unrelated changes, security/session/signed-link risks, env or secret exposure, request/order success honesty, fake SEO or Schema.org claims, raw/runtime/private files, generated-local files, Windows/PowerShell and VPS/Linux workflow problems, broken routes, CI/E2E risks, and package/dependency drift. If there are no findings, say that clearly. Then provide checks run or skipped, residual risks, and a minimal fix plan for any findings. Suggest a commit message only if the diff is acceptable. Do not commit unless explicitly asked.
 
 ## D. Fix only P0/P1 review issues
 

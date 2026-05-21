@@ -131,7 +131,25 @@ Expected analysis-only output:
 - Proposed small change plan.
 - Checks that would be required if edits are approved.
 
-## 8. Required Checks
+## 8. Fresh AI-review For Risky Diffs
+
+After implementation, risky diffs must get a fresh AI-review of the current diff before commit or deployment. Prefer a new Codex chat using `.ai/COMMON_PROMPTS.md` prompt `C. Review current diff`, especially when the implementation was complex or touched production flow.
+
+Fresh review is required when the diff touches:
+
+- `app/api/*`.
+- `lib/*` storage, request, order, or auth logic.
+- Backoffice or internal routes.
+- Docker, VPS, deploy, runtime env, or production configuration.
+- Ozon import, catalog visibility, or public catalog data flow.
+- Sitemap, robots, Schema.org, metadata, or SEO visibility.
+- Security, sessions, signed links, private attachments, or secrets.
+- Playwright, E2E, CI, or check infrastructure.
+- Any change that can affect the production request, order, attachment, catalog, or SEO flow.
+
+For complex tasks, the reviewer should not be the same Codex chat that authored the implementation. The reviewer must not edit files; it should inspect `git diff`, classify findings as P0/P1/P2, call out unrelated changes and risk areas, and give a minimal fix plan.
+
+## 9. Required Checks
 
 Default checks for code changes:
 
@@ -174,7 +192,7 @@ If a check cannot be run:
 - Say why it was skipped.
 - Explain the residual risk.
 
-## 9. Git / Commit Guidance
+## 10. Git / Commit Guidance
 
 - Codex should not commit unless the user explicitly asks.
 - One task should produce one small diff.
@@ -200,7 +218,7 @@ git diff --cached --name-status
 
 - Codex final report should include a suggested commit message.
 
-## 10. Expected Report Format
+## 11. Expected Report Format
 
 Codex should finish with this report shape:
 
@@ -238,7 +256,7 @@ Codex should finish with this report shape:
 `<type>: <message>`
 ```
 
-## 11. Windows Command Notes
+## 12. Windows Command Notes
 
 Use PowerShell-friendly commands locally:
 
@@ -279,7 +297,7 @@ Avoid assuming:
 - Bash-only local scripts.
 - Linux path syntax for local Windows commands.
 
-## 12. Examples
+## 13. Examples
 
 ### Example A: Docs-Only Task
 
