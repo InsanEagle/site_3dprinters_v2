@@ -1,6 +1,10 @@
 import { Category, EquipmentItem, FaqItem, Product } from "@/types";
 import {
   categories as catalogCategories,
+  firstLaunchProducts as catalogFirstLaunchProducts,
+  firstLaunchProductSkus as catalogFirstLaunchProductSkus,
+  homepageFeaturedProducts as catalogHomepageFeaturedProducts,
+  homepageFeaturedProductSkus as catalogHomepageFeaturedProductSkus,
   products as catalogProducts,
 } from "@/data/catalog-public";
 
@@ -18,6 +22,14 @@ export const siteConfig = {
 export const categories: Category[] = catalogCategories;
 
 export const products: Product[] = catalogProducts;
+
+export const firstLaunchProductSkus = catalogFirstLaunchProductSkus;
+
+export const homepageFeaturedProductSkus = catalogHomepageFeaturedProductSkus;
+
+export const firstLaunchProducts: Product[] = catalogFirstLaunchProducts;
+
+export const homepageFeaturedProducts: Product[] = catalogHomepageFeaturedProducts;
 
 export const faqItems: FaqItem[] = [
   {
