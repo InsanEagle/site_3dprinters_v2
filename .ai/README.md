@@ -11,6 +11,7 @@ Local workflow assumptions:
 - Codex should not commit unless explicitly asked.
 - One task should produce one small, focused diff.
 - Risky tasks should start analysis-only before edits.
+- VS Code tasks are available through Terminal -> Run Task. Use `npm: check:all` as the standard full local check.
 
 ## Source Map
 
