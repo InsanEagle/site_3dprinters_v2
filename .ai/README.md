@@ -13,6 +13,34 @@ Local workflow assumptions:
 - Risky tasks should start analysis-only before edits.
 - VS Code tasks are available through Terminal -> Run Task. Use `npm: check:all` as the standard full local check.
 
+## Three-level AI workflow
+
+Use the 3-level workflow as the default shape for complex or risky work: Audit -> Implement -> Review.
+
+Level 1: Audit
+
+- No code changes.
+- Inspect relevant files and source-of-truth docs.
+- Identify risks and likely failure modes.
+- Propose a minimal implementation plan.
+- Define checks to run after implementation.
+
+Level 2: Implement
+
+- Implement the approved plan only.
+- Keep the diff minimal.
+- Do not make unrelated changes.
+- Run relevant checks, using `npm run check:all` when appropriate.
+
+Level 3: Review
+
+- Do a fresh AI-review of the current diff; prefer a new Codex chat for risky diffs.
+- Do not change code during review.
+- Classify findings as P0/P1/P2.
+- Suggest a minimal fix plan for confirmed issues.
+
+For risky areas, use all 3 levels. For simple docs-only tasks, Audit and Review can be lightweight or skipped with a clear explanation.
+
 ## Source Map
 
 | Need | Read |

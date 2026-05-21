@@ -87,6 +87,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 
 - One task should produce one small, focused diff.
 - For normal small tasks, use a short prompt from `.ai/COMMON_PROMPTS.md` when it fits.
+- Default complex/risky workflow: Audit -> Implement -> Review.
 - Risky tasks should start as analysis-only.
 - Risky implemented diffs must get a fresh AI-review before commit or deployment.
 - Codex should not commit by itself.

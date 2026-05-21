@@ -131,7 +131,13 @@ Expected analysis-only output:
 - Proposed small change plan.
 - Checks that would be required if edits are approved.
 
-## 8. Fresh AI-review For Risky Diffs
+## 8. Default AI Execution Modes
+
+- Simple task: Implement -> checks -> report.
+- Risky task: Audit -> Implement -> Fresh Review -> Fix P0/P1 -> checks -> commit.
+- Docs-only task: implement + `git diff --check`; `npm run check:all` is optional with an explanation.
+
+## 9. Fresh AI-review For Risky Diffs
 
 After implementation, risky diffs must get a fresh AI-review of the current diff before commit or deployment. Prefer a new Codex chat using `.ai/COMMON_PROMPTS.md` prompt `C. Review current diff`, especially when the implementation was complex or touched production flow.
 
@@ -149,7 +155,7 @@ Fresh review is required when the diff touches:
 
 For complex tasks, the reviewer should not be the same Codex chat that authored the implementation. The reviewer must not edit files; it should inspect `git diff`, classify findings as P0/P1/P2, call out unrelated changes and risk areas, and give a minimal fix plan.
 
-## 9. Required Checks
+## 10. Required Checks
 
 Default checks for code changes:
 
@@ -192,7 +198,7 @@ If a check cannot be run:
 - Say why it was skipped.
 - Explain the residual risk.
 
-## 10. Git / Commit Guidance
+## 11. Git / Commit Guidance
 
 - Codex should not commit unless the user explicitly asks.
 - One task should produce one small diff.
@@ -218,7 +224,7 @@ git diff --cached --name-status
 
 - Codex final report should include a suggested commit message.
 
-## 11. Expected Report Format
+## 12. Expected Report Format
 
 Codex should finish with this report shape:
 
@@ -256,7 +262,7 @@ Codex should finish with this report shape:
 `<type>: <message>`
 ```
 
-## 12. Windows Command Notes
+## 13. Windows Command Notes
 
 Use PowerShell-friendly commands locally:
 
@@ -297,7 +303,7 @@ Avoid assuming:
 - Bash-only local scripts.
 - Linux path syntax for local Windows commands.
 
-## 13. Examples
+## 14. Examples
 
 ### Example A: Docs-Only Task
 

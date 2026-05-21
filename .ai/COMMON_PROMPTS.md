@@ -2,17 +2,17 @@
 
 Copy one prompt into Codex in VS Code, then add the concrete task details below it.
 
-## A. Analyze task, no changes
+## A. Level 1 - Audit task, no changes
 
-Read `AGENTS.md` and relevant docs from `docs/*`. Analyze the task only; do not change files. Use Windows + VS Code assumptions and PowerShell-friendly local commands. Report current state, involved files, risks, a small implementation plan, checks to run, and a suggested commit message. Do not commit unless explicitly asked.
+Read `AGENTS.md`, `.ai/README.md`, `docs/project-state.md`, `docs/next-actions.md`, `docs/code-review.md`, `docs/decision-log.md`, and any task-relevant docs. Audit the task only; do not change files. Use Windows + VS Code assumptions and PowerShell-friendly commands. Inspect relevant files, report current state, risks, a minimal implementation plan, checks to run, and whether a fresh Review is needed after implementation. Do not commit unless explicitly asked.
 
-## B. Implement approved plan
+## B. Level 2 - Implement approved plan
 
-Read `AGENTS.md`, `docs/project-state.md`, `docs/next-actions.md`, `docs/decision-log.md`, and any task-relevant docs. Implement only the approved small plan. Do not change unrelated files. Use Windows + VS Code workflow and PowerShell-friendly commands. Run `npm run check:all` when appropriate. Report changed files, checks, remaining risks, and a suggested commit message. Do not commit unless explicitly asked.
+Read `AGENTS.md`, `.ai/README.md`, `docs/project-state.md`, `docs/next-actions.md`, `docs/code-review.md`, `docs/decision-log.md`, and any task-relevant docs. Implement only the approved plan. Keep the diff minimal and do not change unrelated files. Use Windows + VS Code workflow and PowerShell-friendly commands. Run relevant checks, including `npm run check:all` when appropriate. Report changed files, checks, remaining risks, and a suggested commit message. Do not commit unless explicitly asked.
 
-## C. Review current diff
+## C. Level 3 - Review current diff
 
-Read `AGENTS.md`, `docs/decision-log.md`, and `docs/code-review.md`. Review the current git diff as a code review; do not change files. Run `git diff` and inspect the changed files only as needed to understand the diff. Classify findings as P0/P1/P2 and report findings first. Look specifically for unrelated changes, security/session/signed-link risks, env or secret exposure, request/order success honesty, fake SEO or Schema.org claims, raw/runtime/private files, generated-local files, Windows/PowerShell and VPS/Linux workflow problems, broken routes, CI/E2E risks, and package/dependency drift. If there are no findings, say that clearly. Then provide checks run or skipped, residual risks, and a minimal fix plan for any findings. Suggest a commit message only if the diff is acceptable. Do not commit unless explicitly asked.
+Read `AGENTS.md`, `.ai/README.md`, `docs/code-review.md`, and `docs/decision-log.md`. Review the current `git diff`; do not change files. Inspect changed files only as needed to understand the diff. Classify findings as P0/P1/P2 and report findings first. Check for unrelated changes, raw/runtime/private leaks, fake SEO or Schema.org claims, env/runtime risks, request/order success honesty, security/session/signed-link risks, Windows/PowerShell and VPS/Linux issues, CI/E2E risks, and package/dependency drift. If there are no findings, say that clearly. Then provide checks run or skipped, residual risks, and a minimal fix plan for any findings. Suggest a commit message only if the diff is acceptable. Do not commit unless explicitly asked.
 
 ## D. Fix only P0/P1 review issues
 
