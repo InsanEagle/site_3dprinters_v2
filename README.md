@@ -415,9 +415,12 @@ mkdir -p data/orders data/requests data/request-attachments
 3. Запустите:
 
 ```powershell
-docker compose --env-file .env.production up -d --build
+docker compose --env-file .env.production build
+docker compose --env-file .env.production up -d
 docker compose ps
 ```
+
+`docker compose --env-file .env.production build` passes `NEXT_PUBLIC_YANDEX_METRIKA_ID` from `.env.production` into the Docker build as a build arg. Re-run the build after changing the counter ID.
 
 По умолчанию контейнер слушает `3000`, а host binding ограничен loopback: `127.0.0.1:${APP_PORT:-3000}:3000`.
 После подключения reverse proxy / HTTPS внешний порт `3000` не должен быть открыт наружу. Публичный доступ должен идти через Caddy, nginx или Traefik на портах `80/443`, а proxy должен передавать запросы в Next.js на `http://127.0.0.1:3000`.
