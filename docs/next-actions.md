@@ -13,6 +13,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Internal backoffice works.
 - Internal request inbox works.
 - Private signed request attachments work.
+- VPS runtime backup workflow has been added.
 - Ozon catalog refresh has been completed.
 - Basic `/policy` page has been added.
 - Codex task template has been added.
@@ -40,7 +41,6 @@ Update rule: update this file after major project stages, launch-readiness chang
 ## NEXT
 
 - Replace `webhook.site` with a production webhook receiver.
-- Document backup script and cron setup.
 - Run a UX/copy audit for the first wave of products.
 - Switch from `sslip.io` to a real domain.
 - Update product content and SEO descriptions where real product data is available.
@@ -84,6 +84,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Codex task issue template added.
 - First-launch homepage selection and copy polished.
 - Yandex Metrica added through env and verified on VPS.
+- VPS runtime backup workflow added.
 
 ## Working Rules
 
