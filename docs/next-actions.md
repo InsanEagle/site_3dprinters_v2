@@ -34,7 +34,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Mobile product page, request modal, and product cards have passed P1 visual polish.
 - Homepage section contrast / block separation polish has been completed and manually checked.
 - Production product card images have been added for 7 homepage featured SKU.
-- Repo-local Codex skills have been added for `project-task-workflow`, `visual-polish`, and `architecture-deepening-audit`.
+- Repo-local Codex skills have been added for `project-task-workflow`, `visual-polish`, `architecture-deepening-audit`, `bug-diagnose`, and `handoff`.
 - No known code-level P0 blockers are currently open.
 
 ## NOW
@@ -97,7 +97,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Production webhook receiver connected through Make + Google Sheets.
 - VPS runtime backup workflow added.
 - Production product card images added for 7 homepage featured SKU.
-- Local Codex skills added for project workflow, visual polish, and architecture audit.
+- Local Codex skills added for project workflow, visual polish, architecture audit, bug diagnosis, and handoff.
 
 ## Working Rules
 
