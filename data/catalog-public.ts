@@ -126,18 +126,13 @@ export const firstLaunchProductSkus = [
 ] as const;
 
 export const homepageFeaturedProductSkus = [
-  "KANC367",
-  "KANC299",
-  "KANC378",
-  "KANC237",
-  "KANC260",
   "KANC349",
-  "KANC262",
-  "KANC462",
   "KANC324",
-  "KANC284",
-  "KANC441",
-  "KANC476"
+  "KANC323",
+  "KANC462",
+  "KANC367",
+  "KANC378",
+  "KANC441"
 ] as const;
 
 const categoryBySlug = new Map(publicCategories.map((category) => [category.slug, category]));
