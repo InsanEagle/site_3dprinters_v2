@@ -3,13 +3,13 @@ import { AddToCartButton } from "@/components/cart/add-to-cart-button";
 import { ProductImageStage } from "@/components/shared/product-image-stage";
 import { Button } from "@/components/ui/button";
 import { productContent } from "@/data/content";
+import { resolveProductCardImage } from "@/data/product-image-assets";
 import {
   canProductBePurchasedDirectly,
   getProductAvailabilityLabel,
   getProductCardCtaLabel,
   getProductCardHref,
   getProductCartStatusMessage,
-  getProductImages,
   getProductPriceLabel,
   getProductSalesModeLabel,
   getProductScenarioLabel
@@ -55,8 +55,7 @@ function ProductCardMedia({ product, primaryImage, compact }: { product: Product
 export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
   const summary = getSafeText(product.shortDescription) ?? getSafeText(product.compatibility) ?? productContent.compatibilityFallback;
   const price = getProductPriceLabel(product) ?? productContent.priceFallback;
-  const images = getProductImages(product.images);
-  const primaryImage = images[0];
+  const primaryImage = resolveProductCardImage(product);
   const availabilityLabel = getProductAvailabilityLabel(product.availability);
   const salesModeLabel = getProductSalesModeLabel(product.salesMode);
   const scenarioLabel = getProductScenarioLabel(product);
