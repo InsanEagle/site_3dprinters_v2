@@ -86,10 +86,10 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
       <JsonLd data={createProductJsonLd(product)} />
       <Container>
         <div className="grid gap-8 lg:grid-cols-[minmax(0,1.12fr)_minmax(420px,0.88fr)] lg:items-start xl:gap-12">
-          <div className="order-2 lg:order-1 lg:sticky lg:top-28">
+          <div className="lg:sticky lg:top-28">
             <ProductGallery images={product.images} title={product.name} tone={product.imageTone} />
           </div>
-          <div className="order-1 lg:order-2">
+          <div>
             <p className="text-sm font-medium text-body">{product.categoryLabel}</p>
             <h1 className="mt-3 text-3xl font-semibold tracking-tight text-ink sm:text-4xl">{product.name}</h1>
             {shortDescription ? <p className="mt-4 text-lg leading-8 text-body">{shortDescription}</p> : null}

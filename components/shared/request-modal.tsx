@@ -85,7 +85,7 @@ export function RequestModalProvider({ children }: { children: ReactNode }) {
       {children}
       {state.open ? (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto bg-black/55 p-3 sm:p-4"
+          className="fixed inset-0 z-50 overflow-y-auto bg-black/55 p-2 sm:p-3"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) {
               closeModal();
@@ -97,10 +97,10 @@ export function RequestModalProvider({ children }: { children: ReactNode }) {
               role="dialog"
               aria-modal="true"
               aria-labelledby="request-modal-title"
-              className="my-4 flex max-h-[min(92vh,820px)] w-full max-w-3xl flex-col overflow-hidden rounded-[32px] border border-line bg-white shadow-[0_24px_80px_rgba(15,23,42,0.24)]"
+              className="my-2 flex max-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col overflow-hidden rounded-[28px] border border-line bg-white shadow-[0_24px_80px_rgba(15,23,42,0.24)] sm:my-3 sm:max-h-[calc(100vh-1.5rem)] sm:rounded-[32px]"
               onMouseDown={(event) => event.stopPropagation()}
             >
-              <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-white/95 px-5 py-4 backdrop-blur sm:px-6">
+              <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-white/95 px-5 py-3 backdrop-blur sm:px-6">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-accent">Форма запроса</p>
                   <p className="mt-1 text-sm leading-6 text-body">Можно закрыть окно по кнопке, по клику вне модалки или клавишей Esc.</p>
@@ -115,7 +115,7 @@ export function RequestModalProvider({ children }: { children: ReactNode }) {
                 </button>
               </div>
 
-              <div className="overflow-y-auto px-5 py-5 sm:px-6 sm:py-6">
+              <div className="overflow-y-auto px-5 py-4 sm:px-6 sm:py-5">
                 <RequestForm
                   source={state.source}
                   title={state.title}

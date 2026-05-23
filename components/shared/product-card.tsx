@@ -76,16 +76,16 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       <ProductCardMedia product={product} primaryImage={primaryImage} compact={compact} />
       <p className="text-sm text-body">{product.categoryLabel}</p>
       <h3 className={cn("mt-2 font-semibold text-ink", compact ? "text-lg leading-7 sm:text-xl" : "text-xl")}>{product.name}</h3>
-      <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold uppercase tracking-[0.08em]">
-        <span className="rounded-full bg-surface px-3 py-1 text-body">{salesModeLabel}</span>
-        <span className="rounded-full bg-surface px-3 py-1 text-body">{availabilityLabel}</span>
+      <div className={cn("mt-3 flex flex-wrap text-xs font-semibold uppercase tracking-[0.08em]", compact ? "gap-1.5 sm:gap-2" : "gap-2")}>
+        <span className={cn("rounded-full bg-surface text-body", compact ? "px-2.5 py-1 sm:px-3" : "px-3 py-1")}>{salesModeLabel}</span>
+        <span className={cn("rounded-full bg-surface text-body", compact ? "px-2.5 py-1 sm:px-3" : "px-3 py-1")}>{availabilityLabel}</span>
       </div>
       <p className={cn("mt-3 text-sm leading-6 text-body", compact ? "hidden sm:block" : "")}>{summary}</p>
-      <div className="mt-auto pt-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.08em] text-accent">{scenarioLabel}</p>
-        <div className="mt-2 flex flex-col gap-4">
-          <div className="flex items-end justify-between gap-4">
-            <span className={cn("font-semibold text-ink", compact ? "text-base sm:text-lg" : "text-lg")}>{price}</span>
+      <div className={cn("mt-auto", compact ? "pt-4 sm:pt-5" : "pt-5")}>
+        <p className={cn("text-xs font-semibold uppercase tracking-[0.08em] text-accent", compact ? "leading-5" : "")}>{scenarioLabel}</p>
+        <div className={cn("mt-2 flex flex-col", compact ? "gap-3 sm:gap-4" : "gap-4")}>
+          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+            <span className={cn("font-semibold leading-6 text-ink", compact ? "text-sm sm:text-lg sm:leading-7" : "text-base sm:text-lg sm:leading-7")}>{price}</span>
             {canAddToCart ? (
               <Link href={`/product/${product.slug}`} className="text-sm font-semibold text-body transition hover:text-ink">
                 Подробнее
@@ -99,7 +99,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
           {canAddToCart ? (
             <AddToCartButton slug={product.slug} className="w-full" />
           ) : (
-            <p className={cn("text-sm leading-6 text-body", compact ? "hidden sm:block" : "")}>{cartStatusMessage}</p>
+            <p className="hidden text-sm leading-6 text-body sm:block">{cartStatusMessage}</p>
           )}
         </div>
       </div>
