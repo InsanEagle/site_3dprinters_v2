@@ -69,7 +69,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
     <article
       data-testid={`product-card-${product.slug}`}
       className={cn(
-        "group flex h-full flex-col border border-line bg-white transition hover:-translate-y-0.5 hover:border-accent/45 hover:shadow-card",
+        "group flex h-full flex-col border border-line/90 bg-white shadow-[0_6px_18px_rgba(31,35,40,0.035)] transition hover:-translate-y-0.5 hover:border-accent/45 hover:shadow-card",
         compact ? "rounded-[24px] p-4 sm:rounded-3xl sm:p-5" : "rounded-3xl p-5"
       )}
     >

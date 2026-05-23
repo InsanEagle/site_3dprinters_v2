@@ -38,7 +38,7 @@ export default function HomePage() {
         }
       />
 
-      <section className="py-16 sm:py-20">
+      <section className="border-b border-line/70 py-16 sm:py-20">
         <Container>
           <SectionTitle
             eyebrow="О сайте"
@@ -53,7 +53,7 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section className="py-16 sm:py-20">
+      <section className="border-y border-line/70 bg-white py-16 sm:py-20">
         <Container>
           <SectionTitle eyebrow="Что можно заказать" title={homeContent.introTitle} />
           <FeatureCards items={homeContent.introItems} />
@@ -76,7 +76,7 @@ export default function HomePage() {
         </Container>
       </section>
 
-      <section className="py-16 sm:py-20">
+      <section className="border-t border-line/70 py-16 sm:py-20">
         <Container>
           <SectionTitle
             eyebrow="Каталог"
