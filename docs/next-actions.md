@@ -32,12 +32,12 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Homepage featured products have been narrowed to a stronger first-launch selection.
 - Public copy overrides have been added for homepage featured products.
 - Mobile product page, request modal, and product cards have passed P1 visual polish.
+- Homepage section contrast / block separation polish has been completed and manually checked.
 - No known code-level P0 blockers are currently open.
 
 ## NOW
 
 - Use the new ChatGPT + Codex workflow on the next real product task and adjust docs only if the workflow shows a gap.
-- Manually review polished homepage and first-launch products on 390/768/1024/1280 widths.
 - Review product page SEO descriptions for first-launch SKU group.
 - Keep the working tree clean before starting new tasks.
 - Use a fresh AI-review after important or risky diffs.
@@ -89,6 +89,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Homepage featured products narrowed after first-launch SKU audit.
 - Public copy overrides added for homepage featured products.
 - Mobile product page, request modal, and product cards polished.
+- Homepage section contrast and product card separation polished.
 - Yandex Metrica added through env and verified on VPS.
 - Production webhook receiver connected through Make + Google Sheets.
 - VPS runtime backup workflow added.
