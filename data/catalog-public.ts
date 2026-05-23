@@ -98,6 +98,39 @@ const inquiryRepairSkus = new Set([
   "KANC237"
 ]);
 
+type ProductPublicOverride = Partial<Pick<Product, "name" | "shortDescription" | "description">>;
+
+const productPublicOverrides: Partial<Record<string, ProductPublicOverride>> = {
+  KANC349: {
+    name: "Решетка радиатора для Toyota Cresta JZX90 под покраску",
+    shortDescription: "Пластиковая решетка радиатора для Toyota Cresta JZX90, изготовленная по технологии FDM и поставляемая под покраску."
+  },
+  KANC324: {
+    name: "Правая рамка противотуманной фары для BMW E39",
+    shortDescription: "Правая рамка противотуманной фары для BMW E39, изготовленная по технологии FDM."
+  },
+  KANC323: {
+    name: "Левая рамка противотуманной фары для BMW E39",
+    shortDescription: "Левая рамка противотуманной фары для BMW E39, изготовленная по технологии FDM."
+  },
+  KANC462: {
+    name: "Подстаканник-органайзер для Toyota Crown S140",
+    shortDescription: "FDM-подстаканник для Toyota Crown S140 с отверстиями под мелочи и банковские карты."
+  },
+  KANC367: {
+    name: "Держатель крышки бензобака для Toyota JZX100 Mark 2 / Cresta",
+    shortDescription: "FDM-держатель крышки бензобака для Toyota JZX100 Mark 2 и Cresta."
+  },
+  KANC378: {
+    name: "Комплект клипс нижних молдингов Toyota JZX100",
+    shortDescription: "Комплект FDM-клипс для крепления нижних молдингов Toyota JZX100 Mark 2, Chaser и Cresta."
+  },
+  KANC441: {
+    name: "Спойлер на заднее стекло Toyota Mark 2 GX90 / JZX90",
+    shortDescription: "Козырек на заднее стекло Toyota Mark 2 GX90 / JZX90, изготовленный по технологии FDM и рассчитанный на покраску."
+  }
+};
+
 export const firstLaunchProductSkus = [
   "KANC367",
   "KANC299",
@@ -168,9 +201,11 @@ function toPublicProduct(product: Product): Product | undefined {
   }
 
   const isInquiryRepairPart = inquiryRepairSkus.has(product.sku);
+  const publicOverride = productPublicOverrides[product.sku] ?? {};
 
   return {
     ...product,
+    ...publicOverride,
     category: publicCategory.slug,
     categoryLabel: publicCategory.title,
     salesMode: isInquiryRepairPart ? "inquiry" : product.salesMode,
