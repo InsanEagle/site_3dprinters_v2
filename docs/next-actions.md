@@ -33,6 +33,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Public copy overrides have been added for homepage featured products.
 - Mobile product page, request modal, and product cards have passed P1 visual polish.
 - Homepage section contrast / block separation polish has been completed and manually checked.
+- Production product card images have been added for 7 homepage featured SKU.
 - No known code-level P0 blockers are currently open.
 
 ## NOW
@@ -93,6 +94,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Yandex Metrica added through env and verified on VPS.
 - Production webhook receiver connected through Make + Google Sheets.
 - VPS runtime backup workflow added.
+- Production product card images added for 7 homepage featured SKU.
 
 ## Working Rules
 
