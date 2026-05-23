@@ -29,6 +29,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Production webhook receiver has been connected through Make + Google Sheets.
 - Ozon workflow has been documented.
 - Decision log has been added.
+- Homepage featured products have been narrowed to a stronger first-launch selection.
 - No known code-level P0 blockers are currently open.
 
 ## NOW
@@ -83,6 +84,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - PR template added.
 - Codex task issue template added.
 - First-launch homepage selection and copy polished.
+- Homepage featured products narrowed after first-launch SKU audit.
 - Yandex Metrica added through env and verified on VPS.
 - Production webhook receiver connected through Make + Google Sheets.
 - VPS runtime backup workflow added.
