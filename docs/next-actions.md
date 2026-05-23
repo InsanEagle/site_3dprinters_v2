@@ -26,6 +26,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Dependabot has been added.
 - PR and Codex task issue templates have been added.
 - Yandex Metrica has been connected through env and verified on VPS.
+- Production webhook receiver has been connected through Make + Google Sheets.
 - Ozon workflow has been documented.
 - Decision log has been added.
 - No known code-level P0 blockers are currently open.
@@ -40,7 +41,6 @@ Update rule: update this file after major project stages, launch-readiness chang
 
 ## NEXT
 
-- Replace `webhook.site` with a production webhook receiver.
 - Run a UX/copy audit for the first wave of products.
 - Switch from `sslip.io` to a real domain.
 - Update product content and SEO descriptions where real product data is available.
@@ -84,6 +84,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Codex task issue template added.
 - First-launch homepage selection and copy polished.
 - Yandex Metrica added through env and verified on VPS.
+- Production webhook receiver connected through Make + Google Sheets.
 - VPS runtime backup workflow added.
 
 ## Working Rules
@@ -109,7 +110,6 @@ git status --short -uall
 
 ## Open Questions
 
-- When should the production webhook receiver replace the temporary receiver?
 - When should the real domain be bought and connected?
 - Which 20-30 SKU should stay in the first launch wave?
 - Is `markdownlint` worth adding later?
