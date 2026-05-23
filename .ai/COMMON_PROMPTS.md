@@ -43,3 +43,77 @@ LEVEL 1 - AUDIT: do not change files. Inspect relevant files, describe current b
 LEVEL 2 - IMPLEMENT: start only after the user explicitly writes `APPROVE`. Implement only the approved plan, keep the diff minimal, do not touch unrelated files, and do not add dependencies without a project-specific reason. Run relevant checks, or `npm run check:all` when appropriate, then stop with exactly: `WAITING FOR APPROVE TO REVIEW`.
 
 LEVEL 3 - REVIEW: start only after the user explicitly writes `APPROVE`. Act as a strict reviewer, do not change files, review the current `git diff`, classify issues as P0/P1/P2, check `docs/decision-log.md` and `docs/code-review.md`, and say `can commit` or `must fix`. Do not fix issues without a separate explicit `APPROVE`.
+
+## J. Architecture deepening audit
+
+Use this prompt before large architecture changes, before adding a new workflow or pipeline, when logic starts spreading across multiple files, when deciding whether refactoring is worthwhile, or once every 1-2 weeks as a preventive audit.
+
+Do not use this prompt for docs-only tasks, small visual polish tasks, copy-only tasks, or simple bugfixes with a clear cause.
+
+Read the source-of-truth docs first: `AGENTS.md`, `docs/project-state.md`, `docs/decision-log.md`, `docs/code-review.md`, task-relevant files from `docs/*`, and `.ai/README.md`. Remember that `.ai` is only a quick-start layer; source of truth remains `AGENTS.md` and `docs/*`.
+
+Work analysis-only first. Do not change files. Do not implement anything.
+
+Use these terms consistently: module, interface, implementation, depth, shallow module, deep module, seam, adapter, leverage, locality.
+
+Look for pass-through modules, duplicated rules, logic scattered across callers, too many call sites needing implementation details, interfaces with low leverage, seams introduced without real need, and places where tests would be easier through one deeper interface.
+
+Apply the deletion test for each candidate: "If this module disappeared, would complexity vanish or reappear across many callers?"
+
+Apply the adapter rule: do not recommend a port/seam unless there are at least two justified adapters, such as production + test, external + in-memory, or current + future clearly justified. Otherwise avoid abstract indirection.
+
+Output only 1-3 candidates. For each candidate include current shallow shape, why it hurts, proposed deeper module/interface, expected leverage/locality gain, files likely affected, risk level, smallest safe first diff, and checks needed.
+
+Use this report format:
+
+```md
+## 1. Краткий вывод
+
+## 2. Candidate 1
+
+### Current shallow shape
+
+### Proposed deeper module/interface
+
+### Why this improves leverage/locality
+
+### Files likely affected
+
+### Risks
+
+### Smallest safe first diff
+
+## 3. Candidate 2
+
+### Current shallow shape
+
+### Proposed deeper module/interface
+
+### Why this improves leverage/locality
+
+### Files likely affected
+
+### Risks
+
+### Smallest safe first diff
+
+## 4. Candidate 3
+
+### Current shallow shape
+
+### Proposed deeper module/interface
+
+### Why this improves leverage/locality
+
+### Files likely affected
+
+### Risks
+
+### Smallest safe first diff
+
+## 5. What not to refactor now
+
+## 6. Recommended first refactor
+
+## 7. WAITING FOR APPROVE TO IMPLEMENT
+```
