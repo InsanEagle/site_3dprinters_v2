@@ -24,6 +24,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - CodeQL analysis has been enabled through GitHub UI.
 - Dependabot has been added.
 - PR and Codex task issue templates have been added.
+- Yandex Metrica has been connected through env and verified on VPS.
 - Ozon workflow has been documented.
 - Decision log has been added.
 - No known code-level P0 blockers are currently open.
@@ -39,7 +40,6 @@ Update rule: update this file after major project stages, launch-readiness chang
 ## NEXT
 
 - Replace `webhook.site` with a production webhook receiver.
-- Add Yandex Metrica through env-based configuration.
 - Document backup script and cron setup.
 - Run a UX/copy audit for the first wave of products.
 - Switch from `sslip.io` to a real domain.
@@ -83,6 +83,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - PR template added.
 - Codex task issue template added.
 - First-launch homepage selection and copy polished.
+- Yandex Metrica added through env and verified on VPS.
 
 ## Working Rules
 
@@ -110,7 +111,6 @@ git status --short -uall
 - When should the production webhook receiver replace the temporary receiver?
 - When should the real domain be bought and connected?
 - Which 20-30 SKU should stay in the first launch wave?
-- Is Yandex Metrica needed before the first client showing?
 - Is `markdownlint` worth adding later?
 - Is branch protection needed later if the project moves to PR-based work?
 - When should requests move into a fuller CRM workflow?
