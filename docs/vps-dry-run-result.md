@@ -43,6 +43,8 @@ This document records the result of that dry run without storing secrets, tokens
 
 ## Remaining Before Real Production
 
+This list records the state at the time of the VPS/HTTPS dry run.
+
 - Replace `sslip.io` with a real domain.
 - Replace `webhook.site` with a real webhook receiver.
 - Configure regular backup.
@@ -62,3 +64,15 @@ The next P0 items before real production are operational:
 - verified recurring backup;
 - firewall hardening;
 - privacy/legal readiness.
+
+## Subsequent Updates
+
+After this dry run, the following follow-up work was completed:
+
+- Production webhook receiver connected through Make + Google Sheets.
+- Yandex Metrica connected through env and verified on the VPS.
+- VPS runtime backup workflow added.
+- Production product card images added for 7 homepage featured SKU.
+- Repo-local Codex skills added for project workflow, visual polish, architecture audit, bug diagnosis, and handoff.
+
+The remaining real-production items are now focused on the real domain, firewall/SSH hardening, restore rehearsal, and privacy/legal readiness.

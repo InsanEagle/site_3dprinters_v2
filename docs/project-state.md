@@ -35,6 +35,11 @@ Readiness estimates from the latest audit:
 - Request attachments use private file storage under `data/request-attachments` and signed access routes.
 - Internal order backoffice exists under `/internal/*`.
 - SEO routes now include `/sitemap.xml` and `/robots.txt`.
+- Yandex Metrica is connected through `NEXT_PUBLIC_YANDEX_METRIKA_ID` and has been verified on the VPS.
+- The production receiver path is connected through Make + Google Sheets.
+- VPS runtime backup workflow exists for `data/orders`, `data/requests`, and `data/request-attachments`.
+- Repo-local Codex skills exist for project workflow, visual polish, architecture audit, bug diagnosis, and handoff.
+- Production product card images are configured through `data/product-image-assets.ts` with `cardImage` assets for 7 homepage featured SKU.
 
 Verified after the latest VPS dry run:
 
@@ -47,8 +52,8 @@ Verified after the latest VPS dry run:
 Needs verification before real production:
 
 - Real domain instead of temporary `sslip.io`.
-- Real webhook receiver instead of test receiver.
-- Regular backup schedule and restore rehearsal.
+- Production env after switching from the VPS dry-run URL to the real domain.
+- Recurring backup schedule and restore rehearsal.
 - Firewall hardening for port `3000` and SSH.
 - Legal/privacy readiness for real production.
 
@@ -80,6 +85,7 @@ Workflow source-of-truth docs have been added and should be used by new Codex ch
 - Robots.
 - ESLint pipeline via `npm run lint`.
 - First-launch public product selection exists through `data/catalog-public.ts`; product content and SEO copy may still need polish.
+- Homepage featured products have public copy overrides and local card images for the current 7-SKU homepage selection.
 
 ## 4. Known P0 issues
 
@@ -103,7 +109,7 @@ Current status:
 Remaining P0:
 
 - No known code-level P0 blockers after the VPS/HTTPS dry run.
-- Next P0 before real launch is operational: real domain, real webhook receiver, recurring backup, firewall hardening, SSH restriction, and privacy/legal readiness.
+- Next P0 before real launch is operational: real domain, firewall hardening, SSH restriction, backup restore rehearsal, and privacy/legal readiness.
 
 ## 5. Known P1 issues
 
@@ -111,7 +117,7 @@ Remaining P0:
 - E2E isolation is implemented with `ORDERS_DATA_DIR`, `REQUESTS_DATA_DIR`, `REQUEST_ATTACHMENTS_DIR`, and `tmp/e2e/*` test storage.
 - Clarify checkout as inquiry-first unless real direct-sale SKU data is ready.
 - Add or verify real Ozon URLs if marketplace handoff CTAs are used.
-- Review env/backoffice setup after switching from dry run to real domain and real receiver.
+- Review env/backoffice setup after switching from dry run to real domain.
 - Keep the request inbox minimal until real production usage shows what workflow is actually needed.
 
 ## 6. Known P2 issues
@@ -119,7 +125,7 @@ Remaining P0:
 - Refine categories toward a practical 6-8 category structure if needed.
 - Review and polish imported product descriptions.
 - Improve request admin/backoffice after first launch.
-- Add more curated local product images if relying on external Ozon CDN becomes a risk.
+- Add more curated local product images beyond the current 7 homepage product card images if relying on external Ozon CDN remains a risk.
 - Improve product SEO fields beyond generated metadata.
 
 ## 7. Decisions already made
@@ -153,14 +159,12 @@ Remaining P0:
 ## 9. Current recommended roadmap
 
 1. Replace temporary `sslip.io` access with a real domain.
-2. Replace `webhook.site` with a real webhook receiver.
-3. Configure recurring backup for `data/orders`, `data/requests`, and `data/request-attachments`.
-4. Close external port `3000` and restrict SSH to the operator IP where possible.
-5. Prepare legal/privacy readiness before public launch.
-6. Connect analytics.
-7. Review checkout/product CTAs so the public flow stays inquiry-first unless direct-sale data is real.
-8. Add or verify real Ozon URLs before using marketplace handoff as a serious user path.
-9. Polish imported product descriptions and category grouping.
+2. Close external port `3000` and restrict SSH to the operator IP where possible.
+3. Rehearse restore from the VPS runtime backup archive.
+4. Prepare legal/privacy readiness before public launch.
+5. Review checkout/product CTAs so the public flow stays inquiry-first unless direct-sale data is real.
+6. Add or verify real Ozon URLs before using marketplace handoff as a serious user path.
+7. Polish imported product descriptions, product SEO copy, and category grouping.
 
 ## 10. Last audit summary
 
@@ -173,9 +177,10 @@ The latest audit found a substantial MVP foundation:
 - Several P0 items have since been addressed in follow-up tasks.
 - Minimal Docker/VPS readiness and a production dry run checklist have been added.
 - A Cloud.ru VPS / HTTPS dry run has been completed successfully; details are recorded in `docs/vps-dry-run-result.md`.
+- Since the dry run, Make + Google Sheets receiver, Yandex Metrica, VPS runtime backup workflow, local Codex skills, and 7 homepage product card images have been added.
 
 Residual risk:
 
-- The project is still not fully production-ready until real domain, real webhook receiver, recurring backup, firewall hardening, SSH restriction, and privacy/legal readiness are settled.
+- The project is still not fully production-ready until the real domain, firewall hardening, SSH restriction, backup restore rehearsal, and privacy/legal readiness are settled.
 - Checkout/direct-sale behavior remains secondary to inquiry-first positioning.
 - Product/import quality and Schema.org still need careful review before real SEO launch.

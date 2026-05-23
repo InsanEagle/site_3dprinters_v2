@@ -53,7 +53,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 
 ## LATER
 
-- Add Make/n8n automation after the production receiver path is chosen.
+- Add optional n8n/CRM/Max expansion after real operations show the right shape.
 - Add CRM, Sheets, or Telegram workflow after real operations show the right shape.
 - Add Sentry before public launch if runtime observability becomes necessary.
 - Add branch protection later if the project moves to a PR-based workflow.
