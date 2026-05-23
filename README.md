@@ -467,24 +467,27 @@ sudo chown -R 1001:1001 data/orders data/requests data/request-attachments
 
 ### Backup / restore
 
-Минимальный backup перед деплоем или обновлением:
+Минимальный backup перед деплоем или обновлением на VPS/Linux:
 
 ```bash
 # VPS/Linux only
-mkdir -p backups
-tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
+chmod +x scripts/backup-runtime-data.sh
+./scripts/backup-runtime-data.sh
 ```
+
+Script archives only runtime storage: `data/orders`, `data/requests`, and `data/request-attachments`. Backup archives are written to local/private `backups/` and must not be committed.
 
 Restore:
 
 ```bash
 # VPS/Linux only
 docker compose stop app
-tar -xzf backups/site-data-YYYYMMDD-HHMMSS.tar.gz
+tar -xzf backups/site-runtime-data-YYYYMMDD-HHMMSS.tar.gz
+sudo chown -R 1001:1001 data/orders data/requests data/request-attachments
 docker compose up -d
 ```
 
-После restore проверьте `/internal/orders`, `/internal/requests` и отправку тестовой заявки.
+Подробный manual backup, cron example и restore checklist описаны в [docs/production-dry-run.md](docs/production-dry-run.md).
 
 ## Что сейчас не реализовано
 

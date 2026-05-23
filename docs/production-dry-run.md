@@ -263,18 +263,41 @@ If no direct-sale product is currently intended for real launch, keep checkout a
 
 ## 9. Backup / Restore
 
-Create backup:
+`backups/` is local/private runtime data storage. It can contain customer data from orders, requests, and uploaded request attachments. Do not commit backup archives or copy them into public paths.
+
+Create backup with the VPS/Linux helper script:
+
+```bash
+chmod +x scripts/backup-runtime-data.sh
+./scripts/backup-runtime-data.sh
+```
+
+The script creates:
+
+```text
+backups/site-runtime-data-YYYYMMDD-HHMMSS.tar.gz
+```
+
+Raw tar fallback:
 
 ```bash
 mkdir -p backups
-tar -czf backups/site-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
+tar -czf backups/site-runtime-data-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
 ```
+
+Cron example for a daily VPS/Linux backup at 03:15:
+
+```cron
+15 3 * * * cd /path/to/site && mkdir -p backups && ./scripts/backup-runtime-data.sh >> backups/backup-runtime-data.log 2>&1
+```
+
+`mkdir -p backups` is included because cron creates the redirected log file before the backup script starts.
 
 Restore:
 
 ```bash
 docker compose stop app
-tar -xzf backups/site-data-YYYYMMDD-HHMMSS.tar.gz
+tar -xzf backups/site-runtime-data-YYYYMMDD-HHMMSS.tar.gz
 sudo chown -R 1001:1001 data/orders data/requests data/request-attachments
 docker compose up -d
 ```
@@ -292,7 +315,10 @@ Then verify:
 - `/internal/requests`
 - one existing order
 - one public order status link
+- one signed request attachment link
 - one test request submission
+
+Retention policy is intentionally not automated in this MVP script. Add archive pruning later only after choosing a safe retention window.
 
 ## 10. Reverse Proxy / HTTPS
 
@@ -323,8 +349,7 @@ Do not terminate HTTPS inside the Next.js app for this MVP step.
 Before rollback, backup runtime data:
 
 ```bash
-mkdir -p backups
-tar -czf backups/site-data-before-rollback-$(date +%Y%m%d-%H%M%S).tar.gz data/orders data/requests data/request-attachments
+./scripts/backup-runtime-data.sh
 ```
 
 Rollback code:

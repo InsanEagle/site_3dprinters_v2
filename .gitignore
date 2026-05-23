@@ -21,6 +21,9 @@ data/requests/*
 data/request-attachments/*
 !data/request-attachments/.gitkeep
 
+# Runtime/customer-data backups
+backups/
+
 # Temporary diagnostics/artifacts
 tmp-operations-log.jsonl
 tmp-screens/
