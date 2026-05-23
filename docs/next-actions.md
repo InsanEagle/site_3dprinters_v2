@@ -31,6 +31,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - Decision log has been added.
 - Homepage featured products have been narrowed to a stronger first-launch selection.
 - Public copy overrides have been added for homepage featured products.
+- Mobile product page, request modal, and product cards have passed P1 visual polish.
 - No known code-level P0 blockers are currently open.
 
 ## NOW
@@ -87,6 +88,7 @@ Update rule: update this file after major project stages, launch-readiness chang
 - First-launch homepage selection and copy polished.
 - Homepage featured products narrowed after first-launch SKU audit.
 - Public copy overrides added for homepage featured products.
+- Mobile product page, request modal, and product cards polished.
 - Yandex Metrica added through env and verified on VPS.
 - Production webhook receiver connected through Make + Google Sheets.
 - VPS runtime backup workflow added.
