@@ -9,51 +9,62 @@ function FeatureIcon({ type }: { type: FeatureIconType }) {
       aria-hidden="true"
     >
       <svg
-        viewBox="0 0 44 44"
+        viewBox="0 0 24 24"
         className="h-7 w-7"
         fill="none"
         stroke="currentColor"
         strokeLinecap="round"
         strokeLinejoin="round"
-        strokeWidth="1.7"
+        strokeWidth="2"
       >
         {type === "sample" ? (
           <>
-            <path d="M14 15.5h9.5l6.5 6.5v8.5H14z" />
-            <path d="M23.5 15.5V22H30" className="stroke-accent" />
-            <path d="M17.5 26h9" />
-            <path d="M11 12h5M11 12v5M33 32h-5M33 32v-5" className="stroke-accent" />
+            <path d="M15 8h.01" />
+            <path d="M6 13l2.644 -2.644a1.21 1.21 0 0 1 1.712 0l3.644 3.644" />
+            <path d="M13 13l1.644 -1.644a1.21 1.21 0 0 1 1.712 0l1.644 1.644" />
+            <path d="M4 8v-2a2 2 0 0 1 2 -2h2" />
+            <path d="M4 16v2a2 2 0 0 0 2 2h2" />
+            <path d="M16 4h2a2 2 0 0 1 2 2v2" />
+            <path d="M16 20h2a2 2 0 0 0 2 -2v-2" />
           </>
         ) : null}
 
         {type === "print" ? (
           <>
-            <path d="M14 18.5 22 14l8 4.5-8 4.5z" />
-            <path d="M14 18.5v8.5l8 4.5 8-4.5v-8.5" />
-            <path d="M22 23v8.5" />
-            <path d="M16 34h12" className="stroke-accent" />
-            <path d="M18 37h8" />
+            <path d="M6 17.6l-2 -1.1v-2.5" />
+            <path d="M4 10v-2.5l2 -1.1" />
+            <path d="M10 4.1l2 -1.1l2 1.1" />
+            <path d="M18 6.4l2 1.1v2.5" />
+            <path d="M20 14v2.5l-2 1.12" />
+            <path d="M14 19.9l-2 1.1l-2 -1.1" />
+            <path d="M12 12l2 -1.1" />
+            <path d="M18 8.6l2 -1.1" />
+            <path d="M12 12v2.5" />
+            <path d="M12 18.5v2.5" />
+            <path d="M12 12l-2 -1.12" />
+            <path d="M6 8.6l-2 -1.1" />
           </>
         ) : null}
 
         {type === "model" ? (
           <>
-            <path d="M14 29.5 20.5 17l9.5 9.5-12.5 6.5z" />
-            <path d="m20.5 17 3-3 9.5 9.5-3 3" className="stroke-accent" />
-            <path d="M17.5 25.5h5" />
-            <circle cx="14" cy="29.5" r="1.8" />
-            <circle cx="20.5" cy="17" r="1.8" />
-            <circle cx="30" cy="26.5" r="1.8" />
+            <path d="M3 15a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2" />
+            <path d="M17 15a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2" />
+            <path d="M10 7a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v2a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1v-2" />
+            <path d="M10 8.5a6 6 0 0 0 -5 5.5" />
+            <path d="M14 8.5a6 6 0 0 1 5 5.5" />
+            <path d="M10 8h-6" />
+            <path d="M20 8h-6" />
+            <path d="M2 8a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+            <path d="M20 8a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
           </>
         ) : null}
 
         {type === "series" ? (
           <>
-            <path d="M15 18.5 22 15l7 3.5-7 3.5z" />
-            <path d="m15 24 7 3.5 7-3.5" />
-            <path d="m15 29.5 7 3.5 7-3.5" />
-            <path d="M15 18.5v4M29 18.5v4" />
-            <path d="M33 16v5h-5M11 28v-5h5" className="stroke-accent" />
+            <path d="M12 4l-8 4l8 4l8 -4l-8 -4" />
+            <path d="M4 12l8 4l8 -4" />
+            <path d="M4 16l8 4l8 -4" />
           </>
         ) : null}
       </svg>
