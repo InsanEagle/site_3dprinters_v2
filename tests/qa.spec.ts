@@ -162,7 +162,7 @@ test("smoke: catalog filtering opens the current product page", async ({ page })
   await expect(page).toHaveURL(/\/catalog\?q=KANC474&category=panels/);
   await expect(page.getByTestId(`product-card-${sampleProductSlug}`)).toBeVisible();
 
-  await page.locator(`[data-testid="product-card-${sampleProductSlug}"] a[href="/product/${sampleProductSlug}"]`).first().click();
+  await page.getByTestId(`product-card-main-link-${sampleProductSlug}`).click();
   await expect(page).toHaveURL(`/product/${sampleProductSlug}`);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.getByRole("button", { name: "Подобрать аналог" })).toBeVisible();

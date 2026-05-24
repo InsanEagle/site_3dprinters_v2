@@ -72,14 +72,20 @@ export function ProductCard({ product, compact = false }: { product: Product; co
         compact ? "rounded-[24px] p-4 sm:rounded-3xl sm:p-5" : "rounded-3xl p-5"
       )}
     >
-      <ProductCardMedia product={product} primaryImage={primaryImage} compact={compact} />
-      <p className="text-sm text-body">{product.categoryLabel}</p>
-      <h3 className={cn("mt-2 font-semibold text-ink", compact ? "text-lg leading-7 sm:text-xl" : "text-xl")}>{product.name}</h3>
-      <div className={cn("mt-3 flex flex-wrap text-xs font-semibold uppercase tracking-[0.08em]", compact ? "gap-1.5 sm:gap-2" : "gap-2")}>
-        <span className={cn("rounded-full bg-surface text-body", compact ? "px-2.5 py-1 sm:px-3" : "px-3 py-1")}>{salesModeLabel}</span>
-        <span className={cn("rounded-full bg-surface text-body", compact ? "px-2.5 py-1 sm:px-3" : "px-3 py-1")}>{availabilityLabel}</span>
-      </div>
-      <p className={cn("mt-3 text-sm leading-6 text-body", compact ? "hidden sm:block" : "")}>{summary}</p>
+      <Link
+        href={`/product/${product.slug}`}
+        data-testid={`product-card-main-link-${product.slug}`}
+        className="block rounded-[22px] outline-none transition focus-visible:ring-2 focus-visible:ring-accent/35 focus-visible:ring-offset-4 focus-visible:ring-offset-white"
+      >
+        <ProductCardMedia product={product} primaryImage={primaryImage} compact={compact} />
+        <p className="text-sm text-body">{product.categoryLabel}</p>
+        <h3 className={cn("mt-2 font-semibold text-ink", compact ? "text-lg leading-7 sm:text-xl" : "text-xl")}>{product.name}</h3>
+        <div className={cn("mt-3 flex flex-wrap text-xs font-semibold uppercase tracking-[0.08em]", compact ? "gap-1.5 sm:gap-2" : "gap-2")}>
+          <span className={cn("rounded-full bg-surface text-body", compact ? "px-2.5 py-1 sm:px-3" : "px-3 py-1")}>{salesModeLabel}</span>
+          <span className={cn("rounded-full bg-surface text-body", compact ? "px-2.5 py-1 sm:px-3" : "px-3 py-1")}>{availabilityLabel}</span>
+        </div>
+        <p className={cn("mt-3 text-sm leading-6 text-body", compact ? "hidden sm:block" : "")}>{summary}</p>
+      </Link>
       <div className={cn("mt-auto", compact ? "pt-4 sm:pt-5" : "pt-5")}>
         <p className={cn("text-xs font-semibold uppercase tracking-[0.08em] text-accent", compact ? "leading-5" : "")}>{scenarioLabel}</p>
         <div className={cn("mt-2 flex flex-col", compact ? "gap-3 sm:gap-4" : "gap-4")}>
