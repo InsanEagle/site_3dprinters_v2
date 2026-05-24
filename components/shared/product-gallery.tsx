@@ -26,7 +26,9 @@ export function ProductGallery({
           title={title}
           tone={galleryTone}
           size="gallery"
+          chrome="minimal"
           className="self-start rounded-3xl"
+          frameClassName="min-h-[340px] px-3 py-3 md:min-h-[380px] md:px-4 md:py-4"
           imageClassName="!object-contain"
         />
       ) : (
@@ -51,7 +53,9 @@ export function ProductGallery({
               title={`${title} — изображение ${index + 2}`}
               tone={galleryTone}
               size="thumbnail"
+              chrome="minimal"
               className="rounded-2xl"
+              frameClassName="min-h-[180px] px-2.5 py-2.5"
               imageClassName="!object-contain"
             />
           ))}

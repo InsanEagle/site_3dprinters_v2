@@ -3,13 +3,16 @@ import { cn } from "@/lib/utils";
 
 export type ProductImageTone = "neutral" | "dark";
 export type ProductImageStageSize = "card" | "gallery" | "thumbnail";
+export type ProductImageStageChrome = "default" | "minimal";
 
 type ProductImageStageProps = {
   image: string;
   title: string;
   tone?: ProductImageTone;
   size?: ProductImageStageSize;
+  chrome?: ProductImageStageChrome;
   className?: string;
+  frameClassName?: string;
   imageClassName?: string;
   priority?: boolean;
   testId?: string;
@@ -72,7 +75,9 @@ export function ProductImageStage({
   title,
   tone,
   size = "card",
+  chrome = "default",
   className,
+  frameClassName,
   imageClassName,
   priority = false,
   testId
@@ -81,18 +86,23 @@ export function ProductImageStage({
   const resolvedTone = tone ?? (transparentAsset ? "dark" : "neutral");
   const palette = getStagePalette(resolvedTone);
   const scale = getStageSize(size);
+  const decoratedChrome = chrome === "default";
 
   return (
     <div
       data-testid={testId}
-      className={cn("relative overflow-hidden rounded-[28px] border border-line/80 bg-[#f7f8fa]", className)}
+      className={cn("relative overflow-hidden rounded-[28px] border border-line/80", decoratedChrome ? "bg-[#f7f8fa]" : "bg-white", className)}
     >
-      <div className={cn("absolute inset-0", palette.surface)} />
-      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.44)_0%,rgba(255,255,255,0)_32%,rgba(255,255,255,0.24)_100%)]" />
-      <div className={cn("absolute border border-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]", scale.panelInset, palette.panel)} />
-      <div className={cn("absolute rounded-full blur-2xl", scale.glow, palette.glow)} />
-      <div className="absolute inset-x-[12%] bottom-4 h-px bg-white/70" />
-      <div className={cn("relative flex items-center justify-center", scale.frame)}>
+      {decoratedChrome ? (
+        <>
+          <div className={cn("absolute inset-0", palette.surface)} />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.44)_0%,rgba(255,255,255,0)_32%,rgba(255,255,255,0.24)_100%)]" />
+          <div className={cn("absolute border border-white/75 shadow-[inset_0_1px_0_rgba(255,255,255,0.55)]", scale.panelInset, palette.panel)} />
+          <div className={cn("absolute rounded-full blur-2xl", scale.glow, palette.glow)} />
+          <div className="absolute inset-x-[12%] bottom-4 h-px bg-white/70" />
+        </>
+      ) : null}
+      <div className={cn("relative flex items-center justify-center", frameClassName ?? scale.frame)}>
         <Image
           src={image}
           alt={title}
@@ -103,7 +113,7 @@ export function ProductImageStage({
             "w-full transition duration-300 group-hover:scale-[1.02]",
             scale.image,
             transparentAsset ? "object-contain" : "object-cover",
-            palette.dropShadow,
+            decoratedChrome ? palette.dropShadow : "drop-shadow-[0_10px_18px_rgba(31,35,40,0.08)]",
             imageClassName
           )}
         />
