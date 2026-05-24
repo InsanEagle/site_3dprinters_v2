@@ -168,6 +168,13 @@ test("smoke: catalog filtering opens the current product page", async ({ page })
   await expect(page.getByRole("button", { name: "Подобрать аналог" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Уточнить по товару" })).toBeVisible();
   await expect(page.getByTestId(`add-to-cart-${sampleProductSlug}`)).toHaveCount(0);
+
+  await page.getByTestId("product-gallery-main-trigger").click();
+  const galleryDialog = page.getByRole("dialog", { name: "Галерея изображений товара" });
+  await expect(galleryDialog).toBeVisible();
+  await expect(galleryDialog.getByText("1 / 3")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(galleryDialog).toHaveCount(0);
 });
 
 test("smoke: request form submits successfully with an image", async ({ page }) => {

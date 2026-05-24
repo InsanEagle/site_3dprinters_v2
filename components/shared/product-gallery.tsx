@@ -1,4 +1,5 @@
-import { ProductImageStage, ProductImageTone, isTransparentProductAsset } from "@/components/shared/product-image-stage";
+import { ProductGalleryClient } from "@/components/shared/product-gallery-client";
+import { type ProductImageTone, isTransparentProductAsset } from "@/components/shared/product-image-stage";
 import { getProductImages } from "@/lib/catalog";
 
 function inferGalleryTone(images: string[]): ProductImageTone {
@@ -15,52 +16,23 @@ export function ProductGallery({
   tone?: ProductImageTone;
 }) {
   const galleryImages = getProductImages(images);
-  const primaryImage = galleryImages[0];
   const galleryTone = tone ?? inferGalleryTone(galleryImages);
 
+  if (galleryImages.length) {
+    return <ProductGalleryClient images={galleryImages} title={title} tone={galleryTone} />;
+  }
+
   return (
-    <div className="grid content-start gap-4 self-start">
-      {primaryImage ? (
-        <ProductImageStage
-          image={primaryImage}
-          title={title}
-          tone={galleryTone}
-          size="gallery"
-          chrome="minimal"
-          className="self-start rounded-3xl"
-          frameClassName="min-h-[340px] px-3 py-3 md:min-h-[380px] md:px-4 md:py-4"
-          imageClassName="!object-contain"
-        />
-      ) : (
-        <div className="flex min-h-[380px] flex-col justify-between self-start rounded-3xl border border-line bg-[linear-gradient(135deg,_#f6f7f8_0%,_#eceff3_100%)] p-6">
-          <span className="w-fit rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-body">
-            Изображения не опубликованы
-          </span>
-          <div>
-            <p className="text-xl font-semibold text-ink">{title}</p>
-            <p className="mt-2 max-w-lg text-base leading-7 text-body">
-              По этой позиции пока доступно только описание и параметры для первичной оценки.
-            </p>
-          </div>
-        </div>
-      )}
-      {galleryImages.length > 1 ? (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {galleryImages.slice(1).map((image, index) => (
-            <ProductImageStage
-              key={image}
-              image={image}
-              title={`${title} — изображение ${index + 2}`}
-              tone={galleryTone}
-              size="thumbnail"
-              chrome="minimal"
-              className="rounded-2xl"
-              frameClassName="min-h-[180px] px-2.5 py-2.5"
-              imageClassName="!object-contain"
-            />
-          ))}
-        </div>
-      ) : null}
+    <div className="flex min-h-[380px] flex-col justify-between self-start rounded-3xl border border-line bg-[linear-gradient(135deg,_#f6f7f8_0%,_#eceff3_100%)] p-6">
+      <span className="w-fit rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-body">
+        Изображения не опубликованы
+      </span>
+      <div>
+        <p className="text-xl font-semibold text-ink">{title}</p>
+        <p className="mt-2 max-w-lg text-base leading-7 text-body">
+          По этой позиции пока доступно только описание и параметры для первичной оценки.
+        </p>
+      </div>
     </div>
   );
 }
