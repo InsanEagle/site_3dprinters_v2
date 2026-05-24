@@ -8,8 +8,31 @@ import { ProductCard } from "@/components/shared/product-card";
 import { SectionTitle } from "@/components/shared/section-title";
 import { Timeline } from "@/components/shared/timeline";
 import { homepageFeaturedProducts } from "@/data/site";
-import { faqContent, homeContent, servicesContent, trustContent } from "@/data/content";
+import { faqContent, homeContent, trustContent } from "@/data/content";
 import { HomeActions } from "@/components/page/home-actions";
+
+const homeWorkDirections = [
+  {
+    title: "Разбор задачи и подбор технологии",
+    description:
+      "Уточняем исходные данные: фото, образец, готовую модель, условия работы детали и требования к внешнему виду."
+  },
+  {
+    title: "Подготовка модели к печати",
+    description:
+      "Проверяем геометрию, при необходимости готовим или дорабатываем цифровую модель перед изготовлением."
+  },
+  {
+    title: "FDM-производство и повторяемость",
+    description:
+      "Подбираем материал и параметры печати под задачу; для повторяемых изделий заранее согласуем объём и требования."
+  },
+  {
+    title: "Проверка, доработка и передача изделия",
+    description:
+      "После изготовления сверяем результат с задачей, обсуждаем доработки и удобный способ передачи изделия."
+  }
+];
 
 export default function HomePage() {
   const publishedTrustItems =
@@ -65,14 +88,9 @@ export default function HomePage() {
           <SectionTitle
             eyebrow="Направления"
             title="Основные направления работы"
-            description="Если нужной позиции нет в каталоге, это не ограничивает обращение. Ниже собраны типовые сценарии, с которыми можно начать работу."
+            description="Ниже — не отдельные товары, а рабочие этапы: от первичного разбора задачи до подготовки модели, изготовления и передачи результата."
           />
-          <FeatureCards
-            items={servicesContent.map((service) => ({
-              title: service.title,
-              description: service.shortText
-            }))}
-          />
+          <FeatureCards items={homeWorkDirections} />
         </Container>
       </section>
 
