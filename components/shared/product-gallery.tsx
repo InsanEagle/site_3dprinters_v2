@@ -21,7 +21,14 @@ export function ProductGallery({
   return (
     <div className="grid content-start gap-4 self-start">
       {primaryImage ? (
-        <ProductImageStage image={primaryImage} title={title} tone={galleryTone} size="gallery" className="self-start rounded-3xl" />
+        <ProductImageStage
+          image={primaryImage}
+          title={title}
+          tone={galleryTone}
+          size="gallery"
+          className="self-start rounded-3xl"
+          imageClassName="!object-contain"
+        />
       ) : (
         <div className="flex min-h-[380px] flex-col justify-between self-start rounded-3xl border border-line bg-[linear-gradient(135deg,_#f6f7f8_0%,_#eceff3_100%)] p-6">
           <span className="w-fit rounded-full bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-body">
@@ -45,6 +52,7 @@ export function ProductGallery({
               tone={galleryTone}
               size="thumbnail"
               className="rounded-2xl"
+              imageClassName="!object-contain"
             />
           ))}
         </div>
