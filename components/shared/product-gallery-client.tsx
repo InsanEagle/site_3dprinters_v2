@@ -73,12 +73,12 @@ export function ProductGalleryClient({ images, title, tone }: ProductGalleryClie
             size="gallery"
             chrome="minimal"
             className="self-start rounded-3xl transition group-hover:border-accent/45"
-            frameClassName="min-h-[340px] px-3 py-3 md:min-h-[380px] md:px-4 md:py-4"
+            frameClassName="min-h-[300px] px-3 py-3 sm:min-h-[340px] md:min-h-[380px] md:px-4 md:py-4"
             imageClassName="!object-contain"
           />
         </button>
         {images.length > 1 ? (
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-2 gap-3 sm:gap-4">
             {images.slice(1).map((image, index) => {
               const imageIndex = index + 1;
 
@@ -97,8 +97,8 @@ export function ProductGalleryClient({ images, title, tone }: ProductGalleryClie
                     size="thumbnail"
                     chrome="minimal"
                     className="rounded-2xl transition group-hover:border-accent/45"
-                    frameClassName="min-h-[180px] px-2.5 py-2.5"
-                    imageClassName="!object-contain"
+                    frameClassName="min-h-[128px] px-2.5 py-2.5 sm:min-h-[180px]"
+                    imageClassName="!max-h-[116px] !object-contain sm:!max-h-[180px]"
                   />
                 </button>
               );
