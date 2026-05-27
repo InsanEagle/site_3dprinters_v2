@@ -100,10 +100,10 @@ export function RequestModalProvider({ children }: { children: ReactNode }) {
               className="my-2 flex max-h-[calc(100vh-1rem)] w-full max-w-3xl flex-col overflow-hidden rounded-[28px] border border-line bg-white shadow-[0_24px_80px_rgba(15,23,42,0.24)] sm:my-3 sm:max-h-[calc(100vh-1.5rem)] sm:rounded-[32px]"
               onMouseDown={(event) => event.stopPropagation()}
             >
-              <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-white/95 px-5 py-3 backdrop-blur sm:px-6">
+              <div className="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-line bg-white/95 px-4 py-2.5 backdrop-blur sm:px-6 sm:py-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.12em] text-accent">Форма запроса</p>
-                  <p className="mt-1 text-sm leading-6 text-body">Можно закрыть окно по кнопке, по клику вне модалки или клавишей Esc.</p>
+                  <p className="sr-only mt-1 text-sm leading-6 text-body sm:not-sr-only">Можно закрыть окно по кнопке, по клику вне модалки или клавишей Esc.</p>
                 </div>
                 <button
                   type="button"
@@ -115,7 +115,7 @@ export function RequestModalProvider({ children }: { children: ReactNode }) {
                 </button>
               </div>
 
-              <div className="overflow-y-auto px-5 py-4 sm:px-6 sm:py-5">
+              <div className="overflow-y-auto px-4 py-3 sm:px-6 sm:py-5">
                 <RequestForm
                   source={state.source}
                   title={state.title}
