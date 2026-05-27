@@ -89,14 +89,14 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       <div className={cn("mt-auto", compact ? "pt-4 sm:pt-5" : "pt-5")}>
         <p className={cn("text-xs font-semibold uppercase tracking-[0.08em] text-accent", compact ? "leading-5" : "")}>{scenarioLabel}</p>
         <div className={cn("mt-2 flex flex-col", compact ? "gap-3 sm:gap-4" : "gap-4")}>
-          <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-end sm:justify-between sm:gap-4">
+          <div className="flex flex-col items-start gap-3 lg:flex-row lg:items-end lg:justify-between lg:gap-4">
             <span className={cn("font-semibold leading-6 text-ink", compact ? "text-sm sm:text-lg sm:leading-7" : "text-base sm:text-lg sm:leading-7")}>{price}</span>
             {canAddToCart ? (
               <Link href={`/product/${product.slug}`} className="text-sm font-semibold text-body transition hover:text-ink">
                 Подробнее
               </Link>
             ) : (
-              <Button href={cardHref} variant="secondary" className={compact ? "px-3.5 py-2.5" : "px-4 py-2.5"}>
+              <Button href={cardHref} variant="secondary" className={cn("w-full lg:w-auto", compact ? "px-3.5 py-2.5" : "px-4 py-2.5")}>
                 {ctaLabel}
               </Button>
             )}
